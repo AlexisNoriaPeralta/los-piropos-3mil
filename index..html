@@ -1,0 +1,2357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Piropoteca V3: generador de piropos por categorías, estilos y niveles.">
+<title>✨ Piropoteca V3 | Piropos con estilo</title>
+<style>
+:root{
+  --bg:#fff7fb;--bg2:#f1f7ff;--text:#443b4d;--muted:#776d80;
+  --card:#ffffffde;--accent:#e9a9c7;--accent2:#b9dff1;--line:#ffffffaa;
+  --shadow:0 18px 45px #4d3d5b1c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+ margin:0;font-family:Inter,Arial,Helvetica,sans-serif;color:var(--text);
+ background:linear-gradient(135deg,var(--bg),var(--bg2),#fff8df,#f6efff);
+ background-size:400% 400%;animation:bg 18s ease infinite;transition:.35s;
+}
+body.dark{--bg:#171722;--bg2:#242332;--text:#f5edf7;--muted:#c9bdcf;--card:#2b2939e8;--line:#ffffff18;--shadow:0 18px 45px #0008}
+@keyframes bg{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
+button,input{font:inherit}
+button{border:0;cursor:pointer}
+.topbar{
+ position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+ gap:12px;padding:12px 5%;background:#ffffffc9;backdrop-filter:blur(14px);border-bottom:1px solid var(--line)
+}
+.dark .topbar{background:#171722dd}
+.logo{font-weight:900;color:#7b5578;font-size:1.2rem}.dark .logo{color:#f2b7d5}
+.nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.nav button{background:transparent;padding:8px 10px;border-radius:12px;color:var(--text)}
+.nav button:hover{background:var(--accent)55}
+.hero{min-height:70vh;display:grid;place-items:center;text-align:center;padding:55px 18px 30px;position:relative;overflow:hidden}
+.hero-content{max-width:950px;position:relative;z-index:2}
+.hero h1{font-size:clamp(2.6rem,8vw,6.5rem);line-height:.95;margin:0;color:#795274;text-shadow:0 8px 25px #7a527422}
+.dark .hero h1{color:#f4b9d8}
+.hero p{font-size:clamp(1rem,2vw,1.3rem);line-height:1.6;max-width:800px;margin:20px auto;color:var(--muted)}
+.hero-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.primary,.secondary{
+ padding:14px 20px;border-radius:18px;font-weight:800;box-shadow:0 9px 24px #604b6a22;transition:.2s
+}
+.primary{background:#e9a9c7;color:#55394d}.secondary{background:#fff;color:#55485c}
+.dark .secondary{background:#393747;color:#fff}
+.primary:hover,.secondary:hover{transform:translateY(-3px)}
+.floating{position:absolute;inset:0;pointer-events:none}
+.float{position:absolute;font-size:clamp(1.5rem,4vw,3rem);opacity:.28;animation:float 7s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(15px) rotate(-5deg)}50%{transform:translateY(-25px) rotate(8deg)}}
+.float:nth-child(1){left:8%;top:20%}.float:nth-child(2){left:78%;top:17%;animation-delay:1s}
+.float:nth-child(3){left:18%;top:70%;animation-delay:2s}.float:nth-child(4){left:85%;top:68%;animation-delay:3s}
+.float:nth-child(5){left:48%;top:12%;animation-delay:1.5s}.float:nth-child(6){left:55%;top:80%;animation-delay:2.5s}
+
+section{width:min(1120px,94%);margin:auto}
+.panel{
+ background:var(--card);border:1px solid var(--line);border-radius:28px;padding:24px;
+ box-shadow:var(--shadow);backdrop-filter:blur(10px);margin:18px 0
+}
+.section-title{text-align:center;margin:10px 0 5px;font-size:clamp(1.6rem,4vw,2.5rem);color:#795274}
+.dark .section-title{color:#f2b7d5}
+.section-sub{text-align:center;color:var(--muted);margin:0 auto 20px;max-width:750px}
+.generator{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:14px;align-items:stretch}
+.control-box{background:#ffffff80;border-radius:20px;padding:16px}.dark .control-box{background:#ffffff08}
+.control-box h3{margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:9px 11px;border-radius:13px;background:#fff;border:2px solid transparent;color:#55485c}
+.dark .chip{background:#3a3849;color:#fff}
+.chip.active{border-color:var(--accent);background:var(--accent)55;font-weight:800}
+.piropo-display{
+ min-height:300px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+ padding:28px;border-radius:25px;background:linear-gradient(135deg,var(--accent)44,var(--accent2)55,#fff8);
+ border:2px solid var(--line);position:relative;overflow:hidden
+}
+.piropo-display::before{content:"✨";position:absolute;top:15px;right:20px;font-size:2rem;animation:pulse 1.8s infinite}
+@keyframes pulse{50%{transform:scale(1.25) rotate(8deg)}}
+.quote{font-size:clamp(1.3rem,3vw,2rem);font-weight:800;line-height:1.45;max-width:700px}
+.quote-meta{color:var(--muted);font-size:.9rem;margin:10px}
+.display-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.display-actions button{padding:10px 13px;border-radius:14px;background:#fff;color:#514458}
+.dark .display-actions button{background:#393747;color:#fff}
+.search-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:20px 0}
+.search{width:min(620px,100%);padding:14px 17px;border-radius:17px;border:2px solid transparent;outline:none;background:#fff;color:#443b4d}
+.dark .search{background:#393747;color:#fff}
+.search:focus{border-color:var(--accent)}
+.stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.stat{padding:10px 14px;border-radius:999px;background:#fff8;font-weight:700}
+.dark .stat{background:#ffffff10}
+.categories{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.category{
+ padding:18px;border-radius:22px;background:#fff;border:2px solid transparent;text-align:left;
+ transition:.2s;box-shadow:0 8px 22px #55445b12
+}
+.dark .category{background:#353344;color:#fff}
+.category:hover{transform:translateY(-4px);border-color:var(--accent)}
+.category .emoji{font-size:2rem}.category strong{display:block;margin:8px 0 4px}.category small{color:var(--muted)}
+.accordion{
+ background:var(--card);border:1px solid var(--line);border-radius:22px;margin:12px 0;overflow:hidden;box-shadow:var(--shadow)
+}
+.accordion summary{list-style:none;cursor:pointer;padding:18px 20px;font-size:1.08rem;font-weight:900;display:flex;justify-content:space-between;align-items:center}
+.accordion summary::-webkit-details-marker{display:none}
+.content{padding:0 18px 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:12px}
+.card{
+ background:#fff;border-radius:18px;padding:16px;min-height:145px;border-left:7px solid var(--accent);
+ display:flex;flex-direction:column;justify-content:space-between;gap:12px;box-shadow:0 7px 20px #0000000b
+}
+.dark .card{background:#373546}.card p{margin:0;line-height:1.5}
+.card-actions{display:flex;justify-content:flex-end;gap:7px}
+.small-btn{padding:7px 10px;border-radius:11px;background:#eee8f4;color:#55485c}.dark .small-btn{background:#4a475b;color:#fff}
+.small-btn.active{background:#ffd0e1;color:#a43f6c}
+.level-bar{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:10px 0}
+.progress-wrap{max-width:650px;margin:18px auto}.progress{height:10px;border-radius:999px;background:#ffffff99;overflow:hidden}.progress i{display:block;height:100%;width:0;background:var(--accent);transition:.5s}
+.achievement{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.achievement-card{padding:18px;border-radius:20px;background:#fff}.dark .achievement-card{background:#353344}
+.achievement-card.locked{opacity:.48;filter:grayscale(.7)}
+.achievement-card b{display:block;margin:8px 0}
+.empty{text-align:center;padding:25px;color:var(--muted)}
+footer{text-align:center;padding:45px 15px;color:var(--muted)}
+.toast{position:fixed;bottom:25px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#40394a;color:#fff;padding:13px 18px;border-radius:15px;z-index:100;transition:.25s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.hidden{display:none!important}
+@media(max-width:850px){.generator{grid-template-columns:1fr}.topbar{justify-content:center;flex-direction:column}.hero{min-height:62vh}}
+
+.reaction-bubble{
+  min-height:34px;margin-top:12px;padding:8px 14px;border-radius:999px;
+  font-weight:800;color:#76506e;opacity:0;transform:translateY(8px) scale(.96);
+  transition:.25s;pointer-events:none
+}
+.reaction-bubble.show{opacity:1;transform:translateY(0) scale(1);background:#ffffff88}
+.dark .reaction-bubble{color:#ffd1e5;background:#ffffff10}
+.reaction-bubble.kiss::before{content:"💋 "}
+.reaction-bubble.laugh::before{content:"😂 "}
+.sound-wave{display:inline-flex;gap:3px;align-items:end;height:18px;margin-left:7px;vertical-align:middle}
+.sound-wave i{display:block;width:3px;background:currentColor;border-radius:5px;animation:wave .7s infinite ease-in-out}
+.sound-wave i:nth-child(1){height:7px}.sound-wave i:nth-child(2){height:15px;animation-delay:.12s}
+.sound-wave i:nth-child(3){height:10px;animation-delay:.24s}.sound-wave i:nth-child(4){height:17px;animation-delay:.36s}
+@keyframes wave{50%{transform:scaleY(.45)}}
+.category{position:relative;overflow:hidden}
+.category::after{content:"→";position:absolute;right:15px;bottom:14px;opacity:.35;font-weight:900}
+.mini-note{text-align:center;color:var(--muted);font-size:.9rem;margin-top:12px}
+
+/* ===== V5: ambiente 3D / "4D" visual ===== */
+#scene3d{position:fixed;inset:0;pointer-events:none;z-index:0;perspective:1100px;overflow:hidden}
+#particleLayer{position:fixed;inset:0;pointer-events:none;z-index:80;overflow:hidden}
+#cursorGlow{position:fixed;width:170px;height:170px;border-radius:50%;pointer-events:none;z-index:1;
+background:radial-gradient(circle,#ffd5e866 0,#cdb9ff22 38%,transparent 70%);transform:translate(-50%,-50%);mix-blend-mode:multiply}
+.dark #cursorGlow{mix-blend-mode:screen}
+body>*:not(#scene3d):not(#particleLayer):not(#cursorGlow){position:relative;z-index:2}
+.hero-content,.panel,.category,.accordion,.achievement-card{
+ transform-style:preserve-3d;
+}
+.panel,.category,.accordion,.achievement-card{
+ transition:transform .25s ease,box-shadow .25s ease;
+}
+.hero-content{
+ animation:heroFloat 5s ease-in-out infinite;
+}
+@keyframes heroFloat{0%,100%{transform:translateY(0) rotateX(0deg)}50%{transform:translateY(-7px) rotateX(1deg)}}
+.depth-card{
+ transform:translateZ(35px);
+ box-shadow:0 25px 55px #5e456933, inset 0 1px #ffffffaa;
+}
+.orb{
+ position:absolute;width:clamp(90px,12vw,180px);height:clamp(90px,12vw,180px);
+ border-radius:50%;filter:blur(.2px);opacity:.28;
+ background:radial-gradient(circle at 30% 25%,#fff 0 7%,var(--accent) 35%,transparent 70%);
+ box-shadow:0 0 60px var(--accent);
+ animation:orbFloat 11s ease-in-out infinite;
+}
+.orb.o1{left:-3%;top:18%}.orb.o2{right:-2%;top:42%;animation-delay:2s}.orb.o3{left:45%;bottom:-8%;animation-delay:4s}
+@keyframes orbFloat{0%,100%{transform:translate3d(0,0,0) rotate(0)}50%{transform:translate3d(35px,-35px,90px) rotate(12deg)}}
+.particle{
+ position:absolute;left:50%;top:50%;font-size:22px;opacity:0;
+ animation:particleFly 1.8s cubic-bezier(.2,.8,.2,1) forwards;
+ text-shadow:0 4px 12px #0002;
+}
+@keyframes particleFly{
+ 0%{opacity:0;transform:translate3d(0,0,0) scale(.3) rotate(0)}
+ 15%{opacity:1}
+ 100%{opacity:0;transform:translate3d(var(--x),var(--y),var(--z)) scale(var(--s)) rotate(var(--r))}
+}
+.sparkle{
+ position:absolute;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 12px #fff;
+ animation:spark 2.2s ease-in-out infinite;
+}
+@keyframes spark{50%{transform:scale(2.5);opacity:.3}}
+.heart3d{
+ position:absolute;font-size:clamp(20px,3vw,42px);animation:heartRise 3.2s ease-out forwards;
+ filter:drop-shadow(0 8px 10px #9b557855);
+}
+@keyframes heartRise{
+ 0%{opacity:0;transform:translate3d(0,30px,0) rotate(-15deg) scale(.4)}
+ 12%{opacity:1}
+ 100%{opacity:0;transform:translate3d(var(--dx),-75vh,var(--dz)) rotate(var(--rot)) scale(1.2)}
+}
+.confetti{
+ position:fixed;width:8px;height:15px;border-radius:2px;top:-20px;z-index:95;
+ animation:confettiFall 2.4s linear forwards;
+}
+@keyframes confettiFall{to{transform:translate3d(var(--x),110vh,var(--z)) rotate(720deg);opacity:0}}
+.depth-title{transform:translateZ(20px)}
+.reaction-bubble{
+ box-shadow:0 10px 30px #8d587b22;
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
+}
+<style>
+.badge3d{backdrop-filter:blur(8px);animation:badgePulse 2.5s ease-in-out infinite}
+@keyframes badgePulse{50%{transform:translateZ(45px) scale(1.04)}}
+
+/* ===== V6 RESPONSIVE 3D CAROUSEL ===== */
+.carousel-wrap{position:relative;width:100%;display:flex;align-items:center;gap:10px;margin:18px 0}
+.carousel-viewport{width:100%;overflow:hidden;padding:30px 0 38px;touch-action:pan-y;perspective:1200px}
+.carousel-track{display:flex;align-items:stretch;gap:18px;will-change:transform;transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.carousel-track .category{
+  flex:0 0 min(280px,72vw);min-height:210px;text-align:center;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  transform-origin:center;opacity:.48;filter:saturate(.65) blur(.15px);
+  transform:scale(.84) rotateY(18deg);transition:transform .55s,opacity .55s,filter .55s,box-shadow .55s;
+}
+.carousel-track .category.active{
+  opacity:1;filter:none;transform:scale(1.08) rotateY(0deg) translateZ(70px);
+  box-shadow:0 25px 55px #69536d35;
+}
+.carousel-track .category.prev{transform:scale(.9) rotateY(14deg) translateZ(0)}
+.carousel-track .category.next{transform:scale(.9) rotateY(-14deg) translateZ(0)}
+.carousel-arrow{
+  flex:0 0 48px;width:48px;height:48px;border-radius:50%;
+  background:#ffffffd9;color:#604b62;font-size:2.1rem;line-height:1;
+  box-shadow:0 10px 25px #55445b24;z-index:5;transition:.2s
+}
+.dark .carousel-arrow{background:#383647;color:#fff}
+.carousel-arrow:hover{transform:scale(1.08);background:var(--accent)}
+.carousel-dots{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin:-8px 0 10px}
+.carousel-dot{width:9px;height:9px;border-radius:50%;padding:0;background:#b9acbd;transition:.25s}
+.carousel-dot.active{width:28px;border-radius:99px;background:var(--accent)}
+.swipe-hint{display:none}
+@media(max-width:700px){
+  .carousel-wrap{gap:2px}
+  .carousel-arrow{flex:0 0 38px;width:38px;height:38px;font-size:1.7rem}
+  .carousel-viewport{padding:20px 0 30px}
+  .carousel-track{gap:10px}
+  .carousel-track .category{flex-basis:78vw;min-height:190px}
+  .carousel-track .category.active{transform:scale(1.02) translateZ(30px)}
+  .carousel-track .category.prev,.carousel-track .category.next{transform:scale(.88)}
+  .nav button{font-size:.84rem;padding:7px 8px}
+  .panel{padding:15px;border-radius:22px}
+  .hero{padding-top:35px}
+  .hero-buttons button{width:100%;max-width:340px}
+}
+@media(min-width:701px) and (max-width:1050px){
+  .carousel-track .category{flex-basis:250px}
+}
+@media(max-width:420px){
+  .carousel-track .category{flex-basis:82vw}
+  .section-title{font-size:1.7rem}
+  .quote{font-size:1.18rem}
+}
+
+/* ================= V8 ULTIMATE ================= */
+:root{--v8-accent:#e9a9c7;--v8-accent2:#cbb7ef;--v8-card:#ffffffcc}
+.v8-toolbar{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin:14px auto;max-width:1100px}
+.v8-btn{border:0;border-radius:999px;padding:10px 14px;background:var(--v8-card);box-shadow:0 8px 22px #59465d18;font-weight:800;cursor:pointer;color:inherit}
+.v8-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px #59465d25}
+.v8-section{margin:22px auto}
+.v8-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.v8-card{background:var(--v8-card);backdrop-filter:blur(14px);border:1px solid #ffffff66;border-radius:22px;padding:18px;box-shadow:0 16px 40px #59465d15}
+.v8-card h3{margin-top:0}
+.v8-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.v8-stat{padding:14px;border-radius:18px;text-align:center;background:#ffffff77}
+.v8-stat strong{display:block;font-size:1.6rem}
+.v8-select,.v8-input{width:100%;box-sizing:border-box;border:1px solid #cdbfd0;border-radius:14px;padding:11px;background:#ffffffaa;color:inherit}
+.v8-range{width:100%}
+.v8-pills{display:flex;gap:7px;flex-wrap:wrap}
+.v8-pill{border:0;border-radius:999px;padding:8px 11px;background:#ffffff99;cursor:pointer}
+.v8-pill.active{background:var(--v8-accent);font-weight:900}
+.v8-wheel{width:min(300px,78vw);aspect-ratio:1;border-radius:50%;margin:16px auto;display:grid;place-items:center;
+background:conic-gradient(#f6c5d8 0 12.5%,#cde5f4 12.5% 25%,#d9d0f2 25% 37.5%,#cfe6ca 37.5% 50%,#f6dfad 50% 62.5%,#d7c1e9 62.5% 75%,#bfe4df 75% 87.5%,#f0c7b9 87.5% 100%);
+box-shadow:0 20px 55px #55445b35;position:relative;transition:transform 1.5s cubic-bezier(.15,.8,.2,1)}
+.v8-wheel::after{content:"🎲";width:74px;height:74px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:2rem;box-shadow:0 8px 20px #0002}
+.v8-pointer{font-size:2rem;text-align:center}
+.v8-wheel.spin{transform:rotate(1440deg)}
+.v8-achievement{display:flex;align-items:center;gap:12px;padding:12px;border-radius:17px;background:#ffffff66;margin:7px 0}
+.v8-achievement.locked{opacity:.45;filter:grayscale(.8)}
+.v8-achievement .icon{font-size:2rem}
+.v8-card-preview{min-height:180px;border-radius:24px;padding:24px;display:grid;place-items:center;text-align:center;background:linear-gradient(135deg,#ffe1ed,#dcd3ff);box-shadow:0 18px 45px #59465d25}
+.v8-card-preview p{font-size:1.3rem;font-weight:900;max-width:620px}
+.v8-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#151525;color:#bfffc6;border-radius:18px;padding:16px;min-height:100px;overflow:hidden;position:relative}
+.v8-code span{display:inline-block;animation:matrixDrop 3s linear infinite}
+@keyframes matrixDrop{0%{transform:translateY(-15px);opacity:0}15%,80%{opacity:1}100%{transform:translateY(120px);opacity:0}}
+.v8-install{display:none}
+.v8-install.show{display:inline-block}
+.v8-toast2{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#24202a;color:#fff;padding:12px 17px;border-radius:999px;z-index:200;opacity:0;transition:.25s;pointer-events:none}
+.v8-toast2.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:850px){.v8-grid{grid-template-columns:1fr 1fr}.v8-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.v8-grid{grid-template-columns:1fr}.v8-toolbar{justify-content:stretch}.v8-btn{flex:1 1 42%}.v8-card{padding:14px}}
+
+/* ===== V9 INNOVATION PACK ===== */
+.v9-live{position:relative;overflow:hidden}
+.v9-live::before{content:"";position:absolute;inset:-80%;background:conic-gradient(from 0deg,#ffb8d633,#cbb7ef33,#9fe3da33,#ffb8d633);animation:v9Spin 16s linear infinite;pointer-events:none}
+@keyframes v9Spin{to{transform:rotate(360deg)}}
+.v9-live>*{position:relative}
+.v9-grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.v9-fun-btn{min-height:95px;border:0;border-radius:22px;background:#ffffffaa;box-shadow:0 10px 28px #57465d18;font-weight:900;font-size:1rem;cursor:pointer;transition:.25s}
+.v9-fun-btn:hover{transform:translateY(-5px) rotate(-1deg);box-shadow:0 18px 34px #57465d28}
+.v9-big-result{font-size:clamp(1.2rem,3vw,2rem);font-weight:900;text-align:center;padding:22px;border-radius:24px;background:#ffffff77;margin-top:14px;min-height:70px;display:grid;place-items:center}
+.v9-meter{height:18px;background:#ffffff77;border-radius:999px;overflow:hidden}
+.v9-meter span{display:block;height:100%;width:65%;background:linear-gradient(90deg,#9ed7bf,#f4d18d,#f2a9c6);border-radius:999px;transition:width .7s}
+.v9-bubble{position:fixed;z-index:190;font-size:clamp(22px,4vw,44px);pointer-events:none;animation:v9Bubble 2.4s ease-out forwards}
+@keyframes v9Bubble{0%{opacity:0;transform:translateY(20px) scale(.5)}15%{opacity:1}100%{opacity:0;transform:translate(var(--x),-80vh) rotate(var(--r)) scale(1.3)}}
+.v9-auto{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+.v9-toggle{width:54px;height:30px;border-radius:30px;background:#bbb;border:0;padding:3px;cursor:pointer}
+.v9-toggle i{display:block;width:24px;height:24px;background:white;border-radius:50%;transition:.25s}
+.v9-toggle.on{background:var(--accent)} .v9-toggle.on i{transform:translateX(24px)}
+.v9-wheel-small{font-size:3rem;text-align:center;animation:v9Wiggle 1.5s infinite}
+@keyframes v9Wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.v9-achievement-pop{position:fixed;right:18px;top:85px;z-index:210;padding:15px 18px;border-radius:20px;background:#fff;box-shadow:0 15px 40px #0002;animation:v9Pop 3s forwards}
+@keyframes v9Pop{0%{transform:translateX(130%)}12%,82%{transform:translateX(0)}100%{transform:translateX(130%)}}
+@media(max-width:900px){.v9-grid4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.v9-grid4{grid-template-columns:1fr 1fr}.v9-fun-btn{min-height:82px;font-size:.9rem}}
+
+/* ===== V10 EXPERIENCE ULTIMATE ===== */
+.v10-hero{position:relative;overflow:hidden;text-align:center;padding:42px 20px;border-radius:30px;background:linear-gradient(135deg,#ffe0edaa,#ddd5ffaa,#d4f5eeaa);box-shadow:0 25px 70px #51445b20}
+.v10-hero h2{font-size:clamp(2.5rem,8vw,5.8rem);margin:0;font-weight:1000}
+.v10-hero p{max-width:760px;margin:12px auto;font-size:1.05rem}
+.v10-start{border:0;border-radius:999px;padding:15px 28px;background:#fff;font-size:1.05rem;font-weight:900;cursor:pointer;box-shadow:0 15px 35px #0002}
+.v10-start:hover{transform:scale(1.04)}
+.v10-orb{position:absolute;border-radius:50%;filter:blur(3px);opacity:.45;animation:v10Float 7s ease-in-out infinite}
+.v10-orb.a{width:130px;height:130px;background:#f5a8c7;left:3%;top:10%}.v10-orb.b{width:180px;height:180px;background:#b9a5ef;right:3%;bottom:-30px;animation-delay:-2s}
+@keyframes v10Float{50%{transform:translate(20px,-25px) scale(1.1)}}
+.v10-lab{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.v10-tube{padding:15px;border-radius:20px;background:#ffffff88;text-align:center}
+.v10-mix{border:0;border-radius:999px;padding:13px 24px;background:linear-gradient(90deg,#e9a9c7,#b9a5ef);color:#fff;font-weight:900;cursor:pointer}
+.v10-beaker{font-size:4rem;display:block;animation:v10Bub 2s infinite}
+@keyframes v10Bub{50%{transform:translateY(-8px) rotate(4deg)}}
+.v10-dna{height:150px;display:flex;align-items:center;justify-content:center;gap:16px;position:relative;overflow:hidden}
+.v10-dna:before,.v10-dna:after{content:"🧬";font-size:6rem;position:absolute;animation:v10Dna 3s linear infinite}
+.v10-dna:after{animation-delay:-1.5s;opacity:.25}
+@keyframes v10Dna{50%{transform:rotateY(180deg) scale(1.1)}}
+.v10-bars{display:grid;gap:9px}.v10-bar{height:18px;border-radius:99px;background:#ffffff88;overflow:hidden}.v10-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#a9dfd1,#f2abc8,#b9a5ef);transition:width .7s}
+.v10-level{display:flex;align-items:center;gap:14px;padding:14px;border-radius:20px;background:#ffffff77}
+.v10-xp{flex:1;height:14px;background:#ffffff99;border-radius:99px;overflow:hidden}.v10-xp i{display:block;height:100%;width:35%;background:linear-gradient(90deg,#f3b0cf,#a99be9);transition:width .6s}
+.v10-secret{border:2px dashed #c8a6c9;border-radius:22px;padding:20px;text-align:center;background:#ffffff66}
+.v10-secret.locked{filter:blur(2px);opacity:.6}
+.v10-slot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:500px;margin:12px auto}
+.v10-reel{height:100px;display:grid;place-items:center;border-radius:18px;background:#fff;font-size:3rem;box-shadow:inset 0 -10px 20px #0000000d}
+.v10-spin{animation:v10Slot .7s linear infinite}
+@keyframes v10Slot{to{transform:translateY(6px)}}
+.v10-universe{position:relative;min-height:330px;border-radius:28px;background:radial-gradient(circle at center,#443b67,#171626 68%,#080812);overflow:hidden}
+.v10-star{position:absolute;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 10px #fff;animation:v10Twinkle 2s infinite}
+@keyframes v10Twinkle{50%{opacity:.2;transform:scale(.5)}}
+.v10-planet{position:absolute;display:grid;place-items:center;width:78px;height:78px;border-radius:50%;border:0;color:#fff;font-size:1.7rem;cursor:pointer;box-shadow:0 10px 30px #0008}
+.v10-planet.p1{left:9%;top:22%;background:#e8a6c5}.v10-planet.p2{left:38%;top:8%;background:#8bcac1}.v10-planet.p3{right:12%;top:27%;background:#a99be9}.v10-planet.p4{left:28%;bottom:12%;background:#d7b56f}.v10-planet.p5{right:32%;bottom:10%;background:#7db3dd}
+.v10-sun{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:110px;height:110px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#fff1a7,#f3a44e);font-size:2.2rem;box-shadow:0 0 70px #f7bd6d}
+.v10-map{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:12px;align-items:center}
+.v10-node{border:0;border-radius:18px;padding:15px;background:#fff9;box-shadow:0 10px 25px #0001;font-weight:900;cursor:pointer}
+.v10-center{min-height:110px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#e8a7c6,#aaa0e8);color:#fff;font-weight:1000;text-align:center;box-shadow:0 15px 40px #0002}
+.v10-photo{padding:26px;border-radius:26px;text-align:center;background:linear-gradient(135deg,#ffdcea,#dcd6ff);box-shadow:0 20px 50px #0002}
+.v10-photo .big{font-size:1.45rem;font-weight:1000;min-height:85px;display:grid;place-items:center}
+.v10-present{position:fixed;inset:0;z-index:300;background:#11111cee;color:#fff;display:none;padding:30px;overflow:auto}
+.v10-present.show{display:block}
+.v10-slide{max-width:900px;margin:8vh auto;text-align:center}.v10-slide h1{font-size:clamp(3rem,9vw,7rem)}
+.v10-slide p{font-size:1.3rem;line-height:1.7}
+.v10-close{position:fixed;right:20px;top:18px;border:0;border-radius:50%;width:46px;height:46px;font-size:1.4rem}
+.v10-timeline{display:flex;gap:8px;overflow:auto;padding:8px 0}.v10-step{min-width:150px;padding:14px;border-radius:18px;background:#fff8;text-align:center}
+@media(max-width:800px){.v10-lab{grid-template-columns:1fr}.v10-map{grid-template-columns:1fr 1fr}.v10-center{grid-column:1/-1;grid-row:1}.v10-planet{width:62px;height:62px;font-size:1.3rem}}
+@media(max-width:480px){.v10-hero{padding:30px 13px}.v10-planet{width:54px;height:54px;font-size:1.1rem}.v10-universe{min-height:300px}.v10-reel{height:82px;font-size:2.3rem}}
+
+/* ===== V11 FULL EXPERIENCE ===== */
+.v11-panel{background:#ffffff88;border-radius:26px;padding:20px;box-shadow:0 18px 50px #00000010;margin-top:14px}
+.v11-controls{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.v11-select{width:100%;padding:11px;border:1px solid #ffffff;border-radius:14px;background:#fff;font:inherit}
+.v11-smart-result{font-size:clamp(1.1rem,3vw,1.8rem);font-weight:900;text-align:center;padding:24px;border-radius:24px;background:linear-gradient(135deg,#fff8,#ffffff55);min-height:80px;display:grid;place-items:center}
+.v11-wheel-wrap{position:relative;width:min(360px,80vw);margin:20px auto}
+.v11-wheel{width:100%;aspect-ratio:1;border-radius:50%;border:10px solid #fff;box-shadow:0 20px 45px #0003;transition:transform 4s cubic-bezier(.12,.75,.12,1);position:relative;overflow:hidden;background:conic-gradient(#f7c1d7 0 12.5%,#c9bdf0 12.5% 25%,#b9e2d8 25% 37.5%,#f6d99b 37.5% 50%,#b7d7ef 50% 62.5%,#e4c0e8 62.5% 75%,#f2c3a9 75% 87.5%,#c9e2a9 87.5% 100%)}
+.v11-wheel-label{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-weight:1000;color:#fff;text-shadow:0 2px 5px #0008;font-size:1rem;pointer-events:none}
+.v11-pointer{position:absolute;z-index:2;top:-15px;left:50%;transform:translateX(-50%);font-size:2.5rem}
+.v11-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:50%;border:7px solid #fff;background:#fff;color:#444;font-weight:1000;z-index:3}
+.v11-game{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.v11-game-card{border:0;border-radius:20px;padding:18px;background:#fff8;cursor:pointer;font-weight:900;min-height:100px;transition:.25s}.v11-game-card:hover{transform:translateY(-5px)}
+.v11-rare{border:2px solid #e5b3d0;border-radius:20px;padding:18px;background:linear-gradient(135deg,#fff,#f6e9f3);text-align:center}
+.v11-badge{display:inline-block;padding:7px 11px;border-radius:999px;background:#eadcf5;font-weight:900}
+.v11-code{font-family:ui-monospace,monospace;background:#111;color:#aef7c8;border-radius:20px;padding:18px;min-height:120px;white-space:pre-wrap;overflow:auto}
+.v11-slide-controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px}
+@media(max-width:800px){.v11-controls{grid-template-columns:1fr 1fr}.v11-game{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.v11-controls,.v11-game{grid-template-columns:1fr}}
+
+/* ===== V12 CARRUSEL FLUIDO / PERFORMANCE PATCH ===== */
+html{scroll-behavior:auto}
+body{overscroll-behavior-x:none}
+#carouselViewport{
+  touch-action:pan-y;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  contain:layout paint;
+}
+#carouselTrack{
+  will-change:transform;
+  transform:translate3d(0,0,0);
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  perspective:1000px;
+}
+#carouselTrack .carousel-card,
+#carouselTrack .carousel-item,
+#carouselTrack > *{
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  transform:translateZ(0);
+}
+.v12-dragging #carouselTrack{
+  transition:none !important;
+}
+.v12-dragging #carouselTrack *{
+  pointer-events:none;
+}
+.v12-dragging .carousel-card{
+  box-shadow:none !important;
+}
+@media (prefers-reduced-motion: reduce){
+  #carouselTrack{transition:none !important}
+}
+</style><style>
+/* V13 - página completa cargada desde el inicio */
+html{scroll-behavior:auto}
+body{content-visibility:visible}
+.v8-section,.v8-card,.v10-hero,.v10-universe,.v11-panel{
+  content-visibility:visible !important;
+  contain:layout style;
+}
+.v9-bubble,.v10-star{will-change:transform,opacity}
+img{content-visibility:visible}
+</style>
+<style>
+/* ===== V14 PERFORMANCE + CASINO UI ===== */
+.v14-casino{max-width:720px;margin:auto;text-align:center}
+.v14-machine{background:linear-gradient(145deg,#30253b,#16131d);border:8px solid #e3b65b;border-radius:28px;padding:18px;box-shadow:0 18px 35px #0004}
+.v14-marquee{font-weight:1000;letter-spacing:2px;color:#ffe9a6;font-size:clamp(1.1rem,4vw,1.8rem);margin-bottom:12px}
+.v14-reels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:#0b0a0f;border-radius:18px;padding:12px}
+.v14-reelbox{height:125px;background:#fff;border-radius:12px;overflow:hidden;position:relative;border:4px solid #d6d6d6;box-shadow:inset 0 0 15px #0003}
+.v14-reelstrip{position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;transform:translate3d(0,0,0)}
+.v14-symbol{height:125px;display:grid;place-items:center;font-size:3.6rem;flex:0 0 125px}
+.v14-window{position:absolute;inset:35px 0;border-top:3px solid #e2b84e;border-bottom:3px solid #e2b84e;pointer-events:none}
+.v14-lever{margin:16px auto 4px;border:0;border-radius:999px;padding:13px 30px;background:linear-gradient(#ffe39a,#c99534);font-weight:1000;color:#3b2810;cursor:pointer;box-shadow:0 6px 0 #7e5a20}
+.v14-lever:active{transform:translateY(4px);box-shadow:0 2px 0 #7e5a20}
+.v14-lever:disabled{opacity:.6;cursor:not-allowed}
+.v14-result{margin-top:12px;color:#fff;font-weight:900;min-height:28px}
+.v14-ruleta{max-width:460px;margin:auto;text-align:center}
+.v14-wheel-wrap{position:relative;width:min(390px,86vw);aspect-ratio:1;margin:18px auto}
+.v14-wheel{width:100%;height:100%;border-radius:50%;border:9px solid #fff;box-shadow:0 18px 40px #0003;will-change:transform;transform:translateZ(0);background:conic-gradient(#f5b7d0 0 45deg,#bcaee9 45deg 90deg,#a9d9ce 90deg 135deg,#f4d58f 135deg 180deg,#a8cde7 180deg 225deg,#e2b5dd 225deg 270deg,#f2b99e 270deg 315deg,#c5dfa2 315deg 360deg)}
+.v14-wheel-labels{position:absolute;inset:0;border-radius:50%;pointer-events:none}
+.v14-wheel-labels span{position:absolute;left:50%;top:50%;width:90px;margin-left:-45px;margin-top:-12px;text-align:center;font-size:.9rem;font-weight:1000;color:#fff;text-shadow:0 2px 4px #0008;transform-origin:45px 12px}
+.v14-pointer{position:absolute;z-index:3;top:-12px;left:50%;transform:translateX(-50%);font-size:2.4rem}
+.v14-spinbtn{border:0;border-radius:999px;padding:13px 28px;font-weight:1000;background:linear-gradient(135deg,#e8a7c6,#aaa0e8);color:#fff;cursor:pointer;box-shadow:0 10px 25px #0002}
+.v14-spinbtn:disabled{opacity:.6}
+.v14-light{display:inline-block;width:9px;height:9px;border-radius:50%;background:#ffe28a;margin:0 4px;box-shadow:0 0 8px #ffe28a}
+@media(max-width:480px){.v14-symbol{font-size:2.7rem}.v14-reelbox,.v14-symbol{height:100px;flex-basis:100px}.v14-window{inset:28px 0}}
+/* Reduce costly continuous effects while preserving the look. */
+.v10-star{animation:none!important;opacity:.45}
+.v9-bubble{animation:none!important}
+</style>
+
+<style id="responsive-only-override">
+/* RESPONSIVE ONLY: no functionality/content changes */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+img,svg,video,canvas{max-width:100%;height:auto}
+button,input,select,textarea{max-width:100%}
+section{max-width:100%}
+.panel,.v8-card,.v10-hero{min-width:0}
+.search{min-width:0}
+@media (max-width:900px){
+  section{width:min(1120px,96%)}
+  .generator{grid-template-columns:1fr}
+  .v8-grid{grid-template-columns:1fr 1fr}
+  .v9-grid4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .v10-lab{grid-template-columns:1fr 1fr}
+  .topbar{padding:10px 3%;flex-wrap:wrap}
+  .nav{width:100%}
+}
+@media (max-width:700px){
+  .topbar{position:relative;padding:10px 3%;justify-content:center}
+  .logo{width:100%;text-align:center}
+  .nav{gap:4px}
+  .nav button{font-size:12px;padding:7px 7px}
+  .hero{padding:38px 12px 24px;min-height:58vh}
+  section{width:94%}
+  .panel{padding:15px;border-radius:20px}
+  .hero-buttons{width:100%}
+  .hero-buttons button{width:100%;max-width:360px}
+  .search-row{margin:14px 0}
+  .search{width:100%}
+  .generator{grid-template-columns:1fr}
+  .piropo-display{min-height:250px;padding:20px}
+  .quote{font-size:clamp(1.15rem,5vw,1.6rem)}
+  .categories,.grid{grid-template-columns:1fr}
+  .carousel-wrap{width:100%;gap:2px}
+  .carousel-viewport{min-width:0}
+  .carousel-arrow{flex:0 0 38px;width:38px;height:38px}
+  .carousel-track .category{flex-basis:78vw;min-width:0}
+  .v8-grid{grid-template-columns:1fr}
+  .v8-stats{grid-template-columns:repeat(2,1fr)}
+  .v8-toolbar{width:100%}
+  .v8-btn{flex:1 1 42%;min-width:0}
+  .v9-grid4{grid-template-columns:1fr 1fr}
+  .v9-fun-btn{min-height:82px;font-size:.9rem}
+  .v10-lab{grid-template-columns:1fr}
+  .v10-hero{padding:30px 15px}
+  .achievement{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  section{width:calc(100% - 16px)}
+  .panel{padding:12px;border-radius:18px}
+  .hero h1{font-size:clamp(2.25rem,13vw,4rem)}
+  .hero p{font-size:.96rem}
+  .hero-buttons button{padding:12px 16px}
+  .nav button{font-size:11px;padding:6px 5px}
+  .carousel-arrow{flex:0 0 34px;width:34px;height:34px;font-size:1.5rem}
+  .carousel-track .category{flex-basis:82vw}
+  .v8-stats{grid-template-columns:1fr 1fr}
+  .v8-btn{font-size:.82rem;padding:9px 8px}
+  .v9-grid4{grid-template-columns:1fr 1fr}
+  .v9-fun-btn{font-size:.82rem}
+  .v10-hero h2{font-size:clamp(2.2rem,14vw,4rem)}
+  .toast,.v8-toast2{max-width:calc(100% - 24px);text-align:center}
+}
+@media (orientation:landscape) and (max-height:520px) and (max-width:900px){
+  .hero{min-height:auto;padding:24px 12px}
+  .hero-content{animation:none}
+  .panel{margin:10px 0}
+}
+</style>
+
+</head>
+<body>
+<div id="scene3d" aria-hidden="true"></div>
+<div id="particleLayer" aria-hidden="true"></div>
+<div id="cursorGlow" aria-hidden="true"></div>
+
+<nav class="topbar">
+  <div class="logo">✨ Piropoteca V3</div>
+  <div class="nav">
+    <button onclick="go('generador')">🎲 Generador</button>
+    <button onclick="go('categorias')">📚 Categorías</button>
+    <button onclick="go('acordeones')">📂 Acordeones</button>
+    <button onclick="go('logros')">🏆 Logros</button>
+    <button onclick="toggleDark()">🌙</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="floating"><span class="float">💗</span><span class="float">🧪</span><span class="float">π</span><span class="float">⚙️</span><span class="float">{ }</span><span class="float">✨</span></div>
+  <div class="hero-content">
+    <div class="badge3d" style="display:inline-block;padding:8px 15px;border-radius:999px;background:#ffffff77;box-shadow:0 8px 20px #6d557722;transform:translateZ(25px);font-weight:800">🌈 Experiencia 3D / “4D”</div>
+    <h1 class="depth-title">Piropoteca</h1>
+    <p>Una colección de piropos románticos, chistosos, coquetos y atrevidos sin ser sexuales, mezclados con química, matemáticas, ingeniería, tecnología, ciencia y muchos temas más.</p>
+    <div class="mini-note">📱 Responsive: se adapta a celular, tablet, laptop y monitor · 🎠 Navegación en carrusel</div>
+    <div class="hero-buttons">
+      <button class="primary" onclick="go('generador');newPiropo()">🎲 Generar mi piropo</button>
+      <button class="secondary" onclick="go('categorias')">🧩 Explorar categorías</button>
+    </div>
+  </div>
+</header>
+
+
+
+
+<section class="v8-section">
+  <div class="v10-hero" id="v10Welcome">
+    <div class="v10-orb a"></div><div class="v10-orb b"></div>
+    <div style="position:relative">
+      <div style="font-size:2.4rem">✨🧪💗⚙️📐💻🚀</div>
+      <h2>PIROPOTECA</h2>
+      <p>Ciencia, ingeniería, creatividad, humor y romance en una experiencia web interactiva.</p>
+      <button class="v10-start" onclick="v10StartExperience()">🚀 COMENZAR EXPERIENCIA</button>
+    </div>
+  </div>
+</section>
+
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>⚗️ Laboratorio de piropos</h2>
+    <p>Combina ingredientes y crea una mezcla temática.</p>
+    <div class="v10-lab">
+      <div class="v10-tube">🧪<br><b>Ingrediente A</b><br>Química</div>
+      <div class="v10-tube">💗<br><b>Ingrediente B</b><br>Romance</div>
+      <div class="v10-tube">😂<br><b>Ingrediente C</b><br>Humor</div>
+    </div>
+    <div style="text-align:center;margin-top:15px"><span class="v10-beaker">⚗️</span><button class="v10-mix" onclick="v10Mix()">🧪 MEZCLAR</button></div>
+    <div class="v9-big-result" id="v10MixResult">El laboratorio está esperando ingredientes...</div>
+  </div>
+</section>
+
+<section class="v8-section">
+  <div class="v8-grid">
+    <div class="v8-card">
+      <h2>🧬 ADN del piropo</h2>
+      <div class="v10-dna"></div>
+      <div class="v10-bars" id="v10DNA"></div>
+      <button class="v8-btn" onclick="v10AnalyzeDNA()">🔬 Analizar</button>
+    </div>
+    <div class="v8-card">
+      <h2>🎮 Nivel del explorador</h2>
+      <div class="v10-level"><span id="v10LevelIcon">🌱</span><div><b id="v10Level">Curioso</b><div class="v10-xp"><i id="v10XP"></i></div></div></div>
+      <p id="v10LevelText">Genera piropos para ganar experiencia.</p>
+    </div>
+    <div class="v8-card">
+      <h2>🔓 Piropo secreto</h2>
+      <div class="v10-secret" id="v10Secret">🔒 Genera 25 piropos para desbloquear.</div>
+    </div>
+  </div>
+</section>
+
+
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>🎰 Máquina de combinaciones</h2>
+    <p>Como una máquina de casino: los tres carretes giran y se detienen por separado.</p>
+    <div class="v14-casino">
+      <div class="v14-machine">
+        <div class="v14-marquee"><span class="v14-light"></span> PIROPOTECA CASINO <span class="v14-light"></span></div>
+        <div class="v14-reels">
+          <div class="v14-reelbox"><div class="v14-reelstrip" id="v14Reel1"></div><div class="v14-window"></div></div>
+          <div class="v14-reelbox"><div class="v14-reelstrip" id="v14Reel2"></div><div class="v14-window"></div></div>
+          <div class="v14-reelbox"><div class="v14-reelstrip" id="v14Reel3"></div><div class="v14-window"></div></div>
+        </div>
+        <button class="v14-lever" id="v14SlotBtn" onclick="v14SpinSlots()">🎰 TIRAR</button>
+        <div class="v14-result" id="v14SlotResult">¡Listo para girar!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>🌌 Universo de categorías</h2>
+    <p>Explora las categorías como si fueran planetas.</p>
+    <div class="v10-universe" id="v10Universe">
+      <div class="v10-sun">✨</div>
+      <button class="v10-planet p1" onclick="v10Planet('💗 Amor')">💗</button>
+      <button class="v10-planet p2" onclick="v10Planet('🧪 Química')">🧪</button>
+      <button class="v10-planet p3" onclick="v10Planet('📐 Matemáticas')">📐</button>
+      <button class="v10-planet p4" onclick="v10Planet('⚙️ Ingeniería')">⚙️</button>
+      <button class="v10-planet p5" onclick="v10Planet('💻 Sistemas')">💻</button>
+    </div>
+    <div class="v9-big-result" id="v10PlanetResult">Selecciona un planeta.</div>
+  </div>
+</section>
+
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>🗺️ Mapa de conocimiento</h2>
+    <div class="v10-map">
+      <button class="v10-node" onclick="v10Map('💗 Romance')">💗 Romance</button>
+      <button class="v10-center" onclick="v10Map('✨ Piropoteca')">✨<br>PIROPOTECA</button>
+      <button class="v10-node" onclick="v10Map('🧪 Ciencia')">🧪 Ciencia</button>
+      <button class="v10-node" onclick="v10Map('📐 Matemáticas')">📐 Matemáticas</button>
+      <button class="v10-node" onclick="v10Map('⚙️ Ingeniería')">⚙️ Ingeniería</button>
+    </div>
+    <div class="v9-big-result" id="v10MapResult">Elige un nodo para explorar.</div>
+  </div>
+</section>
+
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>📸 Tarjeta visual</h2>
+    <div class="v10-photo">
+      <div>✨ PIROPOTECA ✨</div>
+      <div class="big" id="v10PhotoText">Genera un piropo para crear tu tarjeta.</div>
+      <small id="v10PhotoCategory">Ciencia · Creatividad · Humor</small>
+    </div>
+    <div class="v8-toolbar">
+      <button class="v8-btn" onclick="v10PhotoCopy()">📋 Copiar</button>
+      <button class="v8-btn" onclick="v10PhotoShare()">📤 Compartir</button>
+    </div>
+  </div>
+</section>
+
+
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>🤖 Generador inteligente</h2>
+    <p>Combina parámetros para crear una experiencia distinta en cada generación.</p>
+    <div class="v11-controls">
+      <select class="v11-select" id="v11Cat"><option value="auto">🎲 Categoría aleatoria</option><option>💗 Amor</option><option>🧪 Química</option><option>📐 Matemáticas</option><option>⚙️ Ingeniería</option><option>💻 Sistemas</option><option>🚀 Espacio</option><option>😂 Chistoso</option></select>
+      <select class="v11-select" id="v11Person"><option>🤓 Científico</option><option>😎 Seguro</option><option>😂 Comediante</option><option>💗 Romántico</option><option>🧑‍💻 Programador</option><option>⚙️ Ingeniero</option></select>
+      <select class="v11-select" id="v11Style"><option>✨ Creativo</option><option>😂 Chistoso</option><option>🧠 Inteligente</option><option>🌸 Tierno</option><option>🔥 Atrevido</option></select>
+      <select class="v11-select" id="v11Intensity"><option>🌱 Suave</option><option>✨ Medio</option><option>🔥 Alto</option></select>
+    </div>
+    <div style="text-align:center;margin-top:14px"><button class="v8-btn" onclick="v11SmartGenerate()">🤖 GENERAR</button></div>
+    <div class="v11-smart-result" id="v11SmartResult">Configura tu combinación y genera un piropo.</div>
+  </div>
+</section>
+
+
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>🎡 Ruleta de categorías</h2>
+    <p>Gírala y deja que la ruleta elija automáticamente la categoría.</p>
+    <div class="v14-ruleta">
+      <div class="v14-wheel-wrap">
+        <div class="v14-pointer">🔻</div>
+        <div class="v14-wheel" id="v14Wheel"></div>
+        <div class="v14-wheel-labels" id="v14WheelLabels"></div>
+      </div>
+      <button class="v14-spinbtn" id="v14SpinBtn" onclick="v14SpinWheel()">🎡 GIRAR RULETA</button>
+      <div class="v11-smart-result" id="v14WheelResult">Presiona el botón para comenzar.</div>
+    </div>
+  </div>
+</section>
+
+
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>🧪 Experimentos combinados</h2>
+    <p>Elige dos áreas para crear un “piropo híbrido”.</p>
+    <div class="v11-controls">
+      <select class="v11-select" id="v11MixA"><option>🧪 Química</option><option>📐 Matemáticas</option><option>💻 Sistemas</option><option>⚙️ Ingeniería</option><option>🚀 Espacio</option></select>
+      <select class="v11-select" id="v11MixB"><option>💗 Amor</option><option>😂 Humor</option><option>🧪 Química</option><option>📐 Matemáticas</option><option>⚙️ Ingeniería</option></select>
+    </div>
+    <div style="text-align:center;margin-top:12px"><button class="v8-btn" onclick="v11Hybrid()">⚗️ REALIZAR EXPERIMENTO</button></div>
+    <div class="v11-smart-result" id="v11HybridResult">Esperando combinación...</div>
+  </div>
+</section>
+
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>🃏 Colección de cartas</h2>
+    <div class="v11-rare" id="v11Card">
+      <div style="font-size:3rem">🃏</div>
+      <h3 id="v11CardTitle">Carta misteriosa</h3>
+      <span class="v11-badge" id="v11CardRarity">????</span>
+      <p id="v11CardText">Genera piropos para descubrir cartas.</p>
+    </div>
+    <div style="text-align:center;margin-top:12px"><button class="v8-btn" onclick="v11DrawCard()">🃏 SACAR CARTA</button></div>
+  </div>
+</section>
+
+<section class="v8-section">
+  <div class="v8-grid">
+    <div class="v8-card">
+      <h2>🕵️ Easter eggs</h2>
+      <p id="v11Egg">Todavía no has encontrado ninguno.</p>
+      <button class="v8-btn" onclick="v11EggHunt()">🔎 Buscar secreto</button>
+    </div>
+    <div class="v8-card">
+      <h2>💻 Modo código</h2>
+      <div class="v11-code" id="v11Code">SYSTEM READY...
+PIROPOTECA.online()
+waiting_for_magic();</div>
+      <button class="v8-btn" onclick="v11CodeMode()">▶ Ejecutar</button>
+    </div>
+  </div>
+</section>
+
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>🎮 Mini juegos</h2>
+    <div class="v11-game">
+      <button class="v11-game-card" onclick="v11Game('memory')">🧠<br>Memoria rápida</button>
+      <button class="v11-game-card" onclick="v11Game('guess')">🔮<br>Adivina la categoría</button>
+      <button class="v11-game-card" onclick="v11Game('formula')">🧪<br>Fórmula sorpresa</button>
+    </div>
+    <div class="v11-smart-result" id="v11GameResult">Elige un mini juego.</div>
+  </div>
+</section>
+<section class="v8-section">
+  <div class="v8-card">
+    <h2>🎓 Modo exposición</h2>
+    <p>Convierte la página en una presentación para mostrar el proyecto.</p>
+    <button class="v10-start" onclick="v10Presentation()">🎓 INICIAR PRESENTACIÓN</button>
+    <div class="v10-timeline">
+      <div class="v10-step">01<br>Portada</div><div class="v10-step">02<br>Concepto</div><div class="v10-step">03<br>Categorías</div><div class="v10-step">04<br>Demostración</div><div class="v10-step">05<br>Innovaciones</div><div class="v10-step">06<br>Conclusión</div>
+    </div>
+  </div>
+</section>
+
+<div class="v10-present" id="v10Presentation">
+  <button class="v10-close" onclick="v10ClosePresentation()">×</button>
+  <div class="v10-slide" id="v10Slide">
+    <div style="font-size:3rem">✨🧪💗⚙️📐💻</div>
+    <h1>PIROPOTECA</h1>
+    <p>Una experiencia web interactiva que combina creatividad, ciencia, tecnología, humor y diseño responsive.</p>
+    <button class="v10-start" onclick="v10NextSlide()">Siguiente →</button>
+  </div>
+</div>
+<section class="v8-section v9-live">
+  <div class="v8-card">
+    <h2>🚀 Laboratorio de diversión</h2>
+    <p style="text-align:center;color:var(--muted)">Funciones sorpresa para que tu proyecto se sienta como una pequeña aplicación interactiva.</p>
+    <div class="v9-grid4">
+      <button class="v9-fun-btn" onclick="v9Surprise()">🎁<br>Caja sorpresa</button>
+      <button class="v9-fun-btn" onclick="v9Mood()">😊<br>¿Cómo estás?</button>
+      <button class="v9-fun-btn" onclick="v9EmojiStorm()">🌪️<br>Lluvia de emojis</button>
+      <button class="v9-fun-btn" onclick="v9Daily()">🌟<br>Piropo del día</button>
+    </div>
+    <div class="v9-big-result" id="v9Result">✨ Pulsa cualquier botón para descubrir algo.</div>
+  </div>
+
+  <div class="v8-grid" style="margin-top:14px">
+    <div class="v8-card">
+      <h3>💘 Medidor de química</h3>
+      <p id="v9MeterText">Compatibilidad científica: 65%</p>
+      <div class="v9-meter"><span id="v9MeterBar"></span></div>
+      <button class="v8-btn" style="margin-top:10px" onclick="v9Measure()">🧪 Medir compatibilidad</button>
+    </div>
+    <div class="v8-card">
+      <h3>🧠 Modo detective</h3>
+      <p>Descubre qué área científica combina con el piropo actual.</p>
+      <button class="v8-btn" onclick="v9Detective()">🔎 Analizar piropo</button>
+    </div>
+    <div class="v8-card">
+      <h3>🎯 Reto rápido</h3>
+      <p id="v9Challenge">Genera un piropo y acepta el reto.</p>
+      <button class="v8-btn" onclick="v9Challenge()">🎯 Nuevo reto</button>
+    </div>
+  </div>
+</section>
+<section class="v8-section" id="v8Dashboard">
+  <div class="v8-toolbar">
+    <button class="v8-btn" onclick="v8Generate()">🎲 Generar</button>
+    <button class="v8-btn" onclick="v8Roulette()">🎡 Ruleta</button>
+    <button class="v8-btn" onclick="v8ShowCard()">🎴 Crear tarjeta</button>
+    <button class="v8-btn" onclick="v8RandomTheme()">🌈 Tema</button>
+    <button class="v8-btn v8-install" id="v8InstallBtn" onclick="v8Install()">📲 Instalar app</button>
+  </div>
+
+  <div class="v8-card">
+    <h2>🎛️ Personaliza tu experiencia</h2>
+    <div class="v8-grid">
+      <div>
+        <label><b>🎭 Personalidad</b></label>
+        <div class="v8-pills" id="v8Personality"></div>
+      </div>
+      <div>
+        <label><b>🔥 Intensidad</b></label>
+        <div class="v8-pills" id="v8Intensity"></div>
+      </div>
+      <div>
+        <label><b>🎨 Tema visual</b></label>
+        <select class="v8-select" id="v8Theme" onchange="v8SetTheme(this.value)">
+          <option value="pastel">🌸 Pastel</option><option value="ocean">🌊 Océano</option>
+          <option value="mint">🌿 Menta</option><option value="space">🌌 Espacial</option>
+          <option value="science">🧪 Ciencia</option><option value="neon">🌈 Neón</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <label><b>🔊 Volumen</b></label>
+      <input class="v8-range" id="v8Volume" type="range" min="0" max="1" step=".05" value=".5" oninput="v8Volume=this.value">
+    </div>
+  </div>
+
+  <div class="v8-card" style="margin-top:14px">
+    <h2>📊 Tu Piropoteca</h2>
+    <div class="v8-stats">
+      <div class="v8-stat">🎲<strong id="v8Count">0</strong>generados</div>
+      <div class="v8-stat">❤️<strong id="v8Fav">0</strong>favoritos</div>
+      <div class="v8-stat">🏆<strong id="v8Ach">0</strong>logros</div>
+      <div class="v8-stat">🔥<strong id="v8Streak">0</strong>racha</div>
+    </div>
+  </div>
+
+  <div class="v8-card" style="margin-top:14px">
+    <h2>🎡 Ruleta de categorías</h2>
+    <div class="v8-pointer">▼</div>
+    <div class="v8-wheel" id="v8Wheel"></div>
+    <div style="text-align:center"><b id="v8WheelResult">Pulsa “Ruleta” para elegir una categoría.</b></div>
+  </div>
+
+  <div class="v8-grid" style="margin-top:14px">
+    <div class="v8-card">
+      <h3>🏆 Logros</h3><div id="v8Achievements"></div>
+    </div>
+    <div class="v8-card">
+      <h3>❤️ Mis favoritos</h3>
+      <input class="v8-input" id="v8FavSearch" placeholder="Buscar favorito..." oninput="v8RenderFavorites()">
+      <div id="v8Favorites" style="margin-top:10px"></div>
+    </div>
+    <div class="v8-card">
+      <h3>💻 Efecto de Sistemas</h3>
+      <div class="v8-code" id="v8Code"></div>
+    </div>
+  </div>
+
+  <div class="v8-card" id="v8CardMaker" style="margin-top:14px;display:none">
+    <h2>🎴 Tarjeta para compartir</h2>
+    <div class="v8-card-preview" id="v8CardPreview"><p></p></div>
+    <div class="v8-toolbar">
+      <button class="v8-btn" onclick="v8CopyCard()">📋 Copiar texto</button>
+      <button class="v8-btn" onclick="v8ShareCard()">📤 Compartir</button>
+    </div>
+  </div>
+</section>
+<div id="v8Toast" class="v8-toast2"></div>
+<section id="generador">
+  <h2 class="section-title">🎯 Generador de piropos</h2>
+  <p class="section-sub">Combina una categoría y un estilo para obtener una frase. El sistema evita repetir las últimas frases mostradas.</p>
+  <div class="panel">
+    <div class="generator">
+      <div class="control-box">
+        <h3>📚 Categoría</h3>
+        <div class="chips" id="categoryChips"></div>
+      </div>
+      <div class="piropo-display">
+        <div class="quote-meta" id="displayMeta">Elige una opción</div>
+        <div class="quote" id="displayQuote">Presiona “Generar piropo” para comenzar.</div>
+        <div class="display-actions">
+          <button onclick="newPiropo()">🎲 Otro</button>
+          <button onclick="copyCurrent()">📋 Copiar</button>
+          <button onclick="favoriteCurrent()">♥ Favorito</button>
+          <button onclick="speakCurrent()">🔊 Escuchar</button>
+          <button onclick="shareCurrent()">📤 Compartir</button>
+          <button onclick="testReaction()">🎧 Probar reacción</button>
+        </div>
+      </div>
+      <div class="control-box">
+        <h3>🎭 Estilo</h3>
+        <div class="chips" id="styleChips"></div>
+        <hr style="border:0;border-top:1px solid var(--line);margin:15px 0">
+        <h3>🔥 Intensidad</h3>
+        <div class="level-bar" id="levelChips"></div>
+        <hr style="border:0;border-top:1px solid var(--line);margin:15px 0">
+        <h3>🎧 Reacción al terminar</h3>
+        <div class="chips">
+          <button class="chip active" id="reactionAuto" onclick="setReactionMode('auto')">✨ Automática</button>
+          <button class="chip" id="reactionOff" onclick="setReactionMode('off')">🔇 Sin reacción</button>
+        </div>
+        <small style="display:block;margin-top:8px;color:var(--muted)">La reacción se reproduce después de la lectura del piropo.</small>
+        <div class="chips" style="margin-top:10px">
+          <button class="chip active" id="fxOn" onclick="setFX(true)">✨ Animaciones ON</button>
+          <button class="chip" id="fxOff" onclick="setFX(false)">🫧 Animaciones OFF</button>
+        </div>
+      </div>
+      <div id="reactionBubble" class="reaction-bubble" aria-live="polite"></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="stats">
+        <span class="stat">💬 Vistos: <b id="seenCount">0</b></span>
+        <span class="stat">⭐ Favoritos: <b id="favCount">0</b></span>
+        <span class="stat">🧩 Categorías: <b id="catCount">0</b></span>
+      </div>
+      <div class="progress"><i id="progressBar"></i></div>
+    </div>
+  </div>
+</section>
+
+<section id="categorias">
+  <h2 class="section-title">🧩 Explora por tema</h2>
+  <p class="section-sub">Selecciona una categoría para generar directamente un piropo de ese tema.</p>
+  <div class="carousel-wrap">
+  <button class="carousel-arrow left" onclick="moveCarousel(-1)" aria-label="Categoría anterior">‹</button>
+  <div class="carousel-viewport" id="carouselViewport">
+    <div class="carousel-track" id="categoryCards"></div>
+  </div>
+  <button class="carousel-arrow right" onclick="moveCarousel(1)" aria-label="Categoría siguiente">›</button>
+</div>
+<div class="carousel-dots" id="carouselDots"></div>
+<div class="v9-auto">
+  <b>🎠 Carrusel automático</b>
+  <button id="v9AutoToggle" class="v9-toggle on" onclick="v9ToggleAuto()" aria-label="Activar o pausar carrusel automático"><i></i></button>
+  <select class="v8-select" id="v9Speed" onchange="v9SetSpeed(this.value)" style="width:auto">
+    <option value="7">🐢 7 s</option>
+    <option value="5" selected>⚡ 5 s</option>
+    <option value="3">🚀 3 s</option>
+  </select>
+</div>
+<p class="mini-note">👆 Desliza con el dedo · 👈👉 usa flechas · 🎠 o deja que el carrusel cambie solo</p>
+</section>
+
+<section id="acordeones">
+  <h2 class="section-title">📂 Colección por acordeones</h2>
+  <div class="search-row">
+    <input id="search" class="search" placeholder="🔎 Busca “química”, “sonrisa”, “código”, “amor”..." oninput="filterCards()">
+    <button class="secondary" onclick="showFavorites()">⭐ Ver favoritos</button>
+    <button class="secondary" onclick="clearFilter()">🔄 Mostrar todo</button>
+    <button class="secondary" onclick="burstForCurrent()">✨ Efecto 4D</button>
+  </div>
+  <div id="accordionContainer"></div>
+</section>
+
+<section id="logros">
+  <h2 class="section-title">🏆 Logros</h2>
+  <p class="section-sub">Descubre nuevos piropos y desbloquea insignias.</p>
+  <div class="achievement" id="achievements"></div>
+</section>
+
+<footer>
+  <b>✨ Piropoteca V3</b><br>
+  Proyecto educativo de HTML, CSS y JavaScript · Diseño adaptable · Sin contenido sexual
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = {
+  "💗 Amor": {
+    emoji:"💗",theme:"#f2a9c6", phrases:[
+      "Si el amor fuera una materia, contigo sacaría matrícula de honor.",
+      "Tu sonrisa tiene la extraña habilidad de mejorar cualquier día.",
+      "No eres casualidad, eres mi coincidencia favorita.",
+      "Si fueras una canción, serías mi parte favorita.",
+      "Mi corazón no necesita GPS cuando se trata de encontrarte.",
+      "Contigo hasta los días normales parecen tener una pequeña chispa.",
+      "Si pudiera guardar un momento bonito, elegiría cualquiera en el que aparezcas tú.",
+      "Tu presencia convierte un momento común en un recuerdo especial."
+    ]},
+  "🧪 Química": {
+    emoji:"🧪",theme:"#9bd8bd", phrases:[
+      "Entre tú y yo hay más química que entre reactivos en condiciones ideales.",
+      "Si fueras elemento químico, serías mi número atómico favorito.",
+      "No necesito catalizador para reaccionar cuando te veo.",
+      "Lo nuestro tiene tanta química que hasta el laboratorio tomaría nota.",
+      "Tu sonrisa es mi reacción favorita: siempre libera energía positiva.",
+      "Si fueras una molécula, estudiaría tu estructura de Lewis para entender por qué tienes tantos enlaces conmigo.",
+      "Creo que tú y yo tenemos una electronegatividad bastante compatible.",
+      "Me gustas más que encontrar el resultado correcto después de tres horas de química."
+    ]},
+  "📐 Matemáticas": {
+    emoji:"📐",theme:"#aaa8e7", phrases:[
+      "Eres la variable que siempre quería encontrar.",
+      "Contigo mi función siempre tiende a infinito.",
+      "Ni con cálculo diferencial puedo encontrar el límite de lo mucho que me gustas.",
+      "Somos como dos números primos: especiales y difíciles de separar.",
+      "Tu sonrisa es la única ecuación que nunca quiero resolver.",
+      "Si fueras una integral, me quedaría contigo para siempre, constante incluida.",
+      "Entre todas las funciones, la que más me gusta es la que te pone a ti en mi gráfica.",
+      "Tú eres ese resultado que hace que todo el procedimiento valga la pena."
+    ]},
+  "💻 Sistemas": {
+    emoji:"💻",theme:"#a9d7ef", phrases:[
+      "Mi corazón te tiene como proceso prioritario.",
+      "No eres un bug, pero logras alterar completamente mi sistema.",
+      "Si fueras contraseña, jamás te olvidaría.",
+      "Eres como una buena conexión Wi‑Fi: cuando llegas, todo funciona mejor.",
+      "Mi algoritmo favorito es el que siempre encuentra una excusa para hablar contigo.",
+      "Tu sonrisa no necesita JavaScript para hacer que mi página cobre vida.",
+      "Entre tú y yo hay compatibilidad de versiones.",
+      "Mi corazón no tiene firewall contra tu sonrisa."
+    ]},
+  "⚙️ Ingeniería": {
+    emoji:"⚙️",theme:"#f0c98c", phrases:[
+      "Si fueras un proyecto, serías el que sí quiero terminar.",
+      "No necesito planos para saber que tú encajas perfectamente en mi proyecto.",
+      "Eres la pieza que hace que todo mi sistema funcione.",
+      "Entre tantos problemas de ingeniería, encontrarte fue una solución inesperada.",
+      "Mi proyecto favorito: construir momentos contigo.",
+      "Tu presencia tiene más impacto que una buena solución de ingeniería.",
+      "Si mi vida fuera una máquina, tú serías el engranaje que la hace sonreír.",
+      "Contigo mi diseño tiene estabilidad, precisión y un poquito de emoción."
+    ]},
+  "😏 Atrevidos": {
+    emoji:"😏",theme:"#efb0b0", phrases:[
+      "Yo venía tranquilo y llegaste tú a desordenarme las ideas.",
+      "¿Siempre haces que la gente se ponga nerviosa o solo tienes ese talento conmigo?",
+      "No sé qué traes, pero definitivamente altera mis planes.",
+      "Con esa sonrisa, cualquiera pierde el hilo de la conversación.",
+      "Si mirarte fuera deporte, ya tendría condición olímpica.",
+      "Creo que deberíamos hacer una prueba para comprobar qué tan bien nos llevamos.",
+      "Dicen que hay que seguir las reglas, pero contigo me dan ganas de improvisar.",
+      "Tienes una habilidad bastante peligrosa: hacer que se me olvide lo que iba a decir."
+    ]},
+  "😂 Chistosos": {
+    emoji:"😂",theme:"#f3d57e", phrases:[
+      "¿Eres tarea? Porque no puedo dejar de pensar en ti y tampoco sé por dónde empezar.",
+      "¿Eres examen? Porque me pones nervioso desde que apareces.",
+      "¿Eres calculadora? Porque contigo siempre me salen cuentas bonitas.",
+      "¿Eres Wi‑Fi? Porque siento conexión, aunque todavía no sé la contraseña.",
+      "¿Eres café? Porque contigo mi energía sube inmediatamente.",
+      "No soy Google, pero puedo buscar una excusa para verte.",
+      "Mi celular tiene batería baja, pero para hablar contigo todavía me queda 100%.",
+      "Mi promedio puede variar, pero mis ganas de hablar contigo no."
+    ]},
+  "🌌 Física": {
+    emoji:"🌌",theme:"#aebfe9", phrases:[
+      "Debe existir una fuerza especial, porque siempre termino acercándome a ti.",
+      "Tu sonrisa tiene más brillo que una estrella en mi día.",
+      "Si fueras planeta, pediría ser tu satélite.",
+      "La gravedad explica muchas cosas, pero no explica por qué me atraes tanto.",
+      "Si mi día fuera un universo, tú serías mi galaxia favorita.",
+      "Ni viajando a la velocidad de la luz llegaría tan rápido a una sonrisa como la tuya.",
+      "Entre tanta materia del universo, qué suerte encontrarme contigo."
+    ]},
+  "👨‍💻 Programación": {
+    emoji:"👨‍💻",theme:"#9fd8bb", phrases:[
+      "if (te_veo) { sonrio++; }",
+      "Tu presencia es la función que siempre quiero ejecutar.",
+      "No eres un error de sintaxis, eres mi línea favorita.",
+      "Si fueras un programa, te abriría todos los días.",
+      "Tu sonrisa tiene código fuente propio: cada vez que aparece, cambia mi ánimo.",
+      "Mi corazón funciona mejor cuando tú estás en el sistema.",
+      "Entre tú y yo hay compatibilidad de versiones.",
+      "Mi algoritmo favorito siempre encuentra una excusa para hablar contigo."
+    ]},
+  "🎨 Arte y música": {
+    emoji:"🎨",theme:"#d0a9e6", phrases:[
+      "Si fueras pintura, serías la que elegiría para llenar de color mi día.",
+      "Tu sonrisa tiene ritmo propio y yo feliz de seguirlo.",
+      "Si fueras libro, me quedaría leyendo tus capítulos favoritos una y otra vez.",
+      "Entre tantas canciones, tú eres el estribillo que se me queda en la cabeza.",
+      "Si la vida fuera un museo, tú serías mi obra favorita.",
+      "No soy artista, pero contigo se me ocurren versos sin esfuerzo.",
+      "Tu presencia convierte cualquier escenario en uno interesante."
+    ]},
+  "🌻 Naturaleza": {
+    emoji:"🌻",theme:"#acd99f", phrases:[
+      "Si fueras una flor, serías la que haría sonreír al jardín entero.",
+      "Tu sonrisa tiene más vida que un día de primavera.",
+      "Si fueras estrella, hasta la noche tendría algo que admirar.",
+      "Tu alegría contagia como el sol cuando aparece después de un día nublado.",
+      "Si fueras mariposa, seguro todos se quedarían mirando tu vuelo.",
+      "Tu presencia es como una brisa: llega y mejora el ambiente.",
+      "Entre tantas maravillas naturales, tú tienes una categoría aparte."
+    ]},
+  "📚 Escuela": {
+    emoji:"📚",theme:"#9fcfe0", phrases:[
+      "¿Eres mi materia favorita? Porque siempre quiero volver a verte.",
+      "Contigo sí me dan ganas de participar en clase.",
+      "Si tú fueras proyecto, sí entregaría a tiempo.",
+      "Entre apuntes, tareas y exámenes, encontrarte fue lo más interesante del semestre.",
+      "Si fueras receso, nunca querría que terminara.",
+      "¿Necesitas compañero de equipo? Prometo aportar ideas y muchas sonrisas.",
+      "Mi promedio puede variar, pero mis ganas de hablar contigo no."
+    ]},
+  "✈️ Viajes": {
+    emoji:"✈️",theme:"#b9cce6", phrases:[
+      "Si tú fueras destino, ya tendría el viaje planeado.",
+      "Mi brújula funciona perfecto: siempre apunta hacia donde estás.",
+      "Contigo cualquier camino parece una buena aventura.",
+      "Hay paisajes increíbles, pero ninguno compite con verte sonreír.",
+      "Mi próximo destino: una conversación larga contigo.",
+      "No necesito mapa para encontrar un buen momento si estás cerca."
+    ]},
+  "🧬 Biología": {
+    emoji:"🧬",theme:"#a9dca7", phrases:[
+      "Si fueras célula, serías la que mantiene funcionando mi día.",
+      "Entre millones de posibilidades, qué bonita coincidencia encontrarte.",
+      "Tu sonrisa tiene más vida que cualquier ecosistema.",
+      "Creo que nuestra conexión merece estudiarse en un laboratorio.",
+      "Si fueras ADN, serías la parte más interesante de mi código."
+    ]},
+  "🏗️ Arquitectura": {
+    emoji:"🏗️",theme:"#e8c69c", phrases:[
+      "Si fueras edificio, tendría ganas de admirar cada detalle de tu diseño.",
+      "Tu sonrisa tiene una estructura que nunca pasa de moda.",
+      "Entre tantos planos, contigo encontré mi lugar favorito.",
+      "No necesito AutoCAD para saber que hacemos buena composición juntos.",
+      "Tu presencia hace que cualquier espacio se sienta especial."
+    ]},
+  "🤖 Robótica": {
+    emoji:"🤖",theme:"#b5d5e4", phrases:[
+      "Mi sensor de felicidad se activa cuando apareces.",
+      "Contigo mi sistema siempre entra en modo felicidad.",
+      "Tu sonrisa tiene más precisión que un brazo robótico.",
+      "Si fueras robot, serías el único al que programaría para sonreírme.",
+      "No sé si eres tecnología avanzada, pero impresionas demasiado."
+    ]},
+  "⚡ Electricidad": {
+    emoji:"⚡",theme:"#f0df91", phrases:[
+      "Entre tú y yo hay una corriente que definitivamente se siente.",
+      "Tu sonrisa enciende hasta los días más apagados.",
+      "Si fueras circuito, nunca querría desconectarme.",
+      "Tu presencia tiene voltaje suficiente para cambiar mi día.",
+      "Creo que tenemos una conexión bastante conductora."
+    ]},
+  "🎮 Videojuegos": {
+    emoji:"🎮",theme:"#c5b4e9", phrases:[
+      "Si fueras videojuego, serías el que nunca me cansaría de jugar.",
+      "Contigo desbloqueé un nuevo nivel de felicidad.",
+      "Mi misión favorita sería conseguir otra sonrisa tuya.",
+      "No necesito trucos: tu sonrisa ya es suficiente ventaja.",
+      "Si mi vida fuera un juego, tú serías mi personaje favorito."
+    ]},
+  "⚽ Deportes": {
+    emoji:"⚽",theme:"#b7dba7", phrases:[
+      "Si sonreír por ti fuera deporte, ya tendría medalla.",
+      "Contigo mi corazón siempre juega de local.",
+      "Tu sonrisa me deja sin defensa.",
+      "Si esto fuera una competencia, tú ya ganaste mi atención.",
+      "No necesito marcador para saber que verte fue un punto a favor."
+    ]},
+  "📜 Historia": {
+    emoji:"📜",theme:"#e2c59c", phrases:[
+      "Si fueras acontecimiento histórico, estarías entre mis momentos favoritos.",
+      "Tu sonrisa merece quedar registrada en los mejores recuerdos.",
+      "Entre tantas historias, la nuestra podría tener un buen capítulo.",
+      "No quiero cambiar la historia, solo agregar un momento contigo.",
+      "Tu llegada a mi día ya parece un pequeño acontecimiento."
+    ]},
+  "🍳 Gastronomía": {
+    emoji:"🍳",theme:"#f0c79d", phrases:[
+      "Tu sonrisa es el ingrediente que le faltaba a mi día.",
+      "Si fueras postre, definitivamente pediría una segunda porción de conversación.",
+      "Entre tantas recetas, contigo encontré una combinación perfecta.",
+      "Tu presencia le pone sabor hasta a un día aburrido.",
+      "Creo que tenemos buena química... incluso fuera de la cocina."
+    ]}
+};
+
+const STYLES=["💗 Romántico","😊 Tierno","😂 Chistoso","😉 Coqueto","😏 Atrevido"];
+const LEVELS=["Bajo","Medio","Alto"];
+let selectedCategory=Object.keys(DATA)[0], selectedStyle=STYLES[0], selectedLevel=LEVELS[0];
+let favorites=JSON.parse(localStorage.getItem("piropotecaV3_fav")||"[]");
+let seen=JSON.parse(localStorage.getItem("piropotecaV3_seen")||"[]");
+let recent=JSON.parse(localStorage.getItem("piropotecaV3_recent")||"[]");
+let current={text:"",category:"",style:"",level:""};
+let reactionMode=localStorage.getItem("piropotecaV4_reaction")||"auto";
+let audioContext=null;
+
+
+let fxEnabled=localStorage.getItem("piropotecaV5_fx")!=="0";
+let pointer={x:innerWidth/2,y:innerHeight/2};
+
+function setFX(on){
+  fxEnabled=on;
+  localStorage.setItem("piropotecaV5_fx",on?"1":"0");
+  document.getElementById("fxOn").classList.toggle("active",on);
+  document.getElementById("fxOff").classList.toggle("active",!on);
+  toast(on?"✨ Animaciones activadas":"🫧 Animaciones reducidas");
+}
+function makeScene(){
+  const s=document.getElementById("scene3d");
+  s.innerHTML='<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>';
+  for(let i=0;i<18;i++){
+    const sp=document.createElement("i");sp.className="sparkle";
+    sp.style.left=(Math.random()*100)+"%";sp.style.top=(Math.random()*100)+"%";
+    sp.style.animationDelay=(Math.random()*2.2)+"s";sp.style.animationDuration=(1.5+Math.random()*2)+"s";
+    s.appendChild(sp);
+  }
+}
+function spawnParticles(type,count=18){
+  if(!fxEnabled)return;
+  const layer=document.getElementById("particleLayer");
+  const sets={
+    love:["💗","💖","💕","💘","✨","🌸"],
+    funny:["😂","🤣","✨","⭐","😄"],
+    science:["🧪","⚗️","⚛️","✨","🔬"],
+    math:["π","∑","√","∞","÷","×","✨"],
+    tech:["💻","⌨️","{ }","⚡","🤖","✨"],
+    engineering:["⚙️","🔧","🏗️","📐","✨"],
+    space:["🌌","⭐","🌙","🚀","✨"],
+    food:["🍰","🍓","🍪","✨","🍳"],
+    sport:["⚽","🏆","🔥","✨"],
+    nature:["🌸","🌻","🍃","🦋","✨"]
+  };
+  const arr=sets[type]||sets.love;
+  for(let i=0;i<count;i++){
+    const p=document.createElement("span");p.className="particle";p.textContent=arr[Math.floor(Math.random()*arr.length)];
+    p.style.setProperty("--x",(Math.random()*700-350)+"px");
+    p.style.setProperty("--y",(Math.random()*500-250)+"px");
+    p.style.setProperty("--z",(Math.random()*500-100)+"px");
+    p.style.setProperty("--s",(0.6+Math.random()*1.2).toFixed(2));
+    p.style.setProperty("--r",(Math.random()*360-180)+"deg");
+    p.style.left=(35+Math.random()*30)+"%";p.style.top=(35+Math.random()*30)+"%";
+    layer.appendChild(p);setTimeout(()=>p.remove(),1900);
+  }
+}
+function visualType(category){
+  const c=category.toLowerCase();
+  if(c.includes("amor"))return "love";
+  if(c.includes("chist")||c.includes("atrev"))return "funny";
+  if(c.includes("quím")||c.includes("biolog"))return "science";
+  if(c.includes("matem"))return "math";
+  if(c.includes("sistema")||c.includes("program")||c.includes("robót"))return "tech";
+  if(c.includes("ingen")||c.includes("arquitect")||c.includes("electric"))return "engineering";
+  if(c.includes("fís")||c.includes("viaje"))return "space";
+  if(c.includes("gastro"))return "food";
+  if(c.includes("deport"))return "sport";
+  return "nature";
+}
+function burstForCurrent(){
+  spawnParticles(visualType(current.category),28);
+  if(visualType(current.category)==="love")spawnHearts(12);
+  if(["😂 Chistoso","😏 Atrevido"].includes(current.style)||current.category.includes("Chist"))spawnConfetti(25);
+}
+function spawnHearts(count=10){
+  if(!fxEnabled)return;
+  const layer=document.getElementById("particleLayer");
+  for(let i=0;i<count;i++){
+    const h=document.createElement("span");h.className="heart3d";h.textContent=["💗","💖","💕","💘"][Math.floor(Math.random()*4)];
+    h.style.left=(Math.random()*100)+"%";h.style.bottom="-40px";
+    h.style.setProperty("--dx",(Math.random()*260-130)+"px");
+    h.style.setProperty("--dz",(Math.random()*500)+"px");
+    h.style.setProperty("--rot",(Math.random()*90-45)+"deg");
+    h.style.animationDelay=(Math.random()*.35)+"s";
+    layer.appendChild(h);setTimeout(()=>h.remove(),3600);
+  }
+}
+function spawnConfetti(count=22){
+  if(!fxEnabled)return;
+  const layer=document.getElementById("particleLayer");
+  for(let i=0;i<count;i++){
+    const c=document.createElement("i");c.className="confetti";
+    c.style.left=Math.random()*100+"%";
+    c.style.setProperty("--x",(Math.random()*300-150)+"px");
+    c.style.setProperty("--z",(Math.random()*300)+"px");
+    c.style.background=["#f5a9c6","#a9d8ef","#f2d27d","#b8dfb0","#c8b5e8"][Math.floor(Math.random()*5)];
+    c.style.animationDelay=(Math.random()*.3)+"s";
+    layer.appendChild(c);setTimeout(()=>c.remove(),2600);
+  }
+}
+function add3DParallax(){
+  document.addEventListener("pointermove",e=>{
+    pointer.x=e.clientX;pointer.y=e.clientY;
+    const glow=document.getElementById("cursorGlow");
+    glow.style.left=e.clientX+"px";glow.style.top=e.clientY+"px";
+    if(!fxEnabled)return;
+    document.querySelectorAll(".panel,.category,.accordion").forEach((el,i)=>{
+      const r=el.getBoundingClientRect();
+      if(r.top<innerHeight&&r.bottom>0){
+        const cx=r.left+r.width/2,cy=r.top+r.height/2;
+        const dx=(e.clientX-cx)/Math.max(r.width,500);
+        const dy=(e.clientY-cy)/Math.max(r.height,500);
+        el.style.transform=`perspective(900px) rotateY(${dx*3}deg) rotateX(${-dy*3}deg) translateZ(2px)`;
+      }
+    });
+  });
+  document.addEventListener("pointerleave",()=>document.querySelectorAll(".panel,.category,.accordion").forEach(el=>el.style.transform=""));
+}
+function init(){
+ renderChips();renderCategories();renderAccordions();renderAchievements();updateStats();
+ if(localStorage.getItem("piropotecaV3_dark")==="1")document.body.classList.add("dark");
+}
+function renderChips(){
+ const cc=document.getElementById("categoryChips");
+ cc.innerHTML=Object.entries(DATA).map(([k,v])=>`<button class="chip ${k===selectedCategory?"active":""}" onclick="selectCategory('${esc(k)}')">${v.emoji} ${k.replace(/^\\S+\\s/,"")}</button>`).join("");
+ document.getElementById("styleChips").innerHTML=STYLES.map(x=>`<button class="chip ${x===selectedStyle?"active":""}" onclick="selectedStyle='${x}';renderChips()">${x}</button>`).join("");
+ document.getElementById("levelChips").innerHTML=LEVELS.map(x=>`<button class="chip ${x===selectedLevel?"active":""}" onclick="selectedLevel='${x}';renderChips()">${x}</button>`).join("");
+}
+function selectCategory(k){selectedCategory=k;applyTheme();renderChips();newPiropo();}
+
+let carouselIndex=Math.max(0,Object.keys(DATA).indexOf(selectedCategory));
+let carouselStartX=0, carouselDragging=false;
+
+function updateCarousel(){
+  const track=document.getElementById("categoryCards");
+  const cards=[...track.querySelectorAll(".category")];
+  if(!cards.length)return;
+  carouselIndex=(carouselIndex+cards.length)%cards.length;
+  cards.forEach((c,i)=>{
+    c.classList.toggle("active",i===carouselIndex);
+    c.classList.toggle("prev",i===(carouselIndex-1+cards.length)%cards.length);
+    c.classList.toggle("next",i===(carouselIndex+1)%cards.length);
+  });
+  const card=cards[carouselIndex];
+  const viewport=document.getElementById("carouselViewport");
+  const center=viewport.clientWidth/2;
+  const cardCenter=card.offsetLeft+card.offsetWidth/2;
+  const shift=center-cardCenter;
+  track.style.transform=`translateX(${shift}px)`;
+  renderCarouselDots();
+}
+function renderCarouselDots(){
+  const dots=document.getElementById("carouselDots");
+  if(!dots)return;
+  const n=Object.keys(DATA).length;
+  dots.innerHTML=Array.from({length:n},(_,i)=>
+    `<button class="carousel-dot ${i===carouselIndex?"active":""}" onclick="selectCarouselCategory(${i})" aria-label="Ir a categoría ${i+1}"></button>`
+  ).join("");
+}
+function moveCarousel(step){
+  const n=Object.keys(DATA).length;
+  carouselIndex=(carouselIndex+step+n)%n;
+  selectCarouselCategory(carouselIndex,false);
+}
+function selectCarouselCategory(index,goGenerator=true){
+  const keys=Object.keys(DATA);
+  carouselIndex=(index+keys.length)%keys.length;
+  selectedCategory=keys[carouselIndex];
+  applyTheme();renderChips();updateCarousel();newPiropo();
+  if(goGenerator) toast(`${DATA[selectedCategory].emoji} ${selectedCategory.replace(/^\S+\s/,"")}`);
+}
+function setupCarouselSwipe(){
+  const vp=document.getElementById("carouselViewport");
+  vp.addEventListener("touchstart",e=>{
+    carouselStartX=e.touches[0].clientX;carouselDragging=true;
+  },{passive:true});
+  vp.addEventListener("touchend",e=>{
+    if(!carouselDragging)return;
+    const dx=e.changedTouches[0].clientX-carouselStartX;
+    carouselDragging=false;
+    if(Math.abs(dx)>45)moveCarousel(dx<0?1:-1);
+  },{passive:true});
+  let wheelLock=false;
+  vp.addEventListener("wheel",e=>{
+    if(Math.abs(e.deltaX)<Math.abs(e.deltaY))return;
+    e.preventDefault();
+    if(wheelLock)return;
+    wheelLock=true;moveCarousel(e.deltaX>0?1:-1);
+    setTimeout(()=>wheelLock=false,500);
+  },{passive:false});
+}
+function renderCategories(){
+  const track=document.getElementById("categoryCards");
+  track.innerHTML=Object.entries(DATA).map(([k,v],i)=>`
+    <button class="category" data-index="${i}" onclick="selectCarouselCategory(${i})">
+      <span class="emoji">${v.emoji}</span>
+      <strong>${k.replace(/^\S+\s/,"")}</strong>
+      <small>${v.phrases.length} frases base</small>
+      <span style="margin-top:12px;font-weight:800">Explorar →</span>
+    </button>`).join("");
+  renderCarouselDots();
+  updateCarousel();
+}
+function renderAccordions(){
+ const c=document.getElementById("accordionContainer");
+ c.innerHTML=Object.entries(DATA).map(([k,v])=>`
+ <details class="accordion" data-cat="${esc(k)}">
+   <summary><span>${k}</span><span>＋</span></summary>
+   <div class="content"><div class="grid">${v.phrases.map(p=>cardHTML(p,k)).join("")}</div></div>
+ </details>`).join("");
+}
+function cardHTML(text,cat){
+ return `<article class="card" data-text="${esc(text.toLowerCase())}" data-cat="${esc(cat)}">
+ <p>${text}</p><div class="card-actions">
+ <button class="small-btn" onclick="copyText('${esc(text)}')">📋 Copiar</button>
+ <button class="small-btn ${favorites.includes(text)?"active":""}" onclick="toggleFavorite('${esc(text)}')">${favorites.includes(text)?"♥":"♡"}</button>
+ </div></article>`;
+}
+function esc(s){return s.replaceAll("\\","\\\\").replaceAll("'","\\'").replaceAll('"','&quot;').replaceAll("\n"," ")}
+function newPiropo(){
+ const pool=DATA[selectedCategory].phrases;
+ let candidates=pool.filter(x=>!recent.includes(x));
+ if(!candidates.length){recent=[];candidates=[...pool]}
+ let text=candidates[Math.floor(Math.random()*candidates.length)];
+ recent.push(text);if(recent.length>7)recent.shift();
+ localStorage.setItem("piropotecaV3_recent",JSON.stringify(recent));
+ current={text,category:selectedCategory,style:selectedStyle,level:selectedLevel};
+ seen.push(text);if(seen.length>500)seen=seen.slice(-500);
+ localStorage.setItem("piropotecaV3_seen",JSON.stringify(seen));
+ applyTheme();
+ document.getElementById("displayMeta").textContent=`${DATA[selectedCategory].emoji} ${selectedCategory.replace(/^\\S+\\s/,"")} · ${selectedStyle} · Intensidad ${selectedLevel}`;
+ document.getElementById("displayQuote").textContent=text;
+ document.getElementById("progressBar").style.width=Math.min(100,(new Set(seen).size/100)*100)+"%";
+ updateStats();renderAchievements();
+  if(fxEnabled) burstForCurrent();
+}
+function applyTheme(){
+ const c=DATA[selectedCategory].theme;
+ document.documentElement.style.setProperty("--accent",c);
+ document.documentElement.style.setProperty("--accent2",c+"99");
+}
+function toggleFavorite(text=current.text){
+ if(!text)return;
+ if(favorites.includes(text)){favorites=favorites.filter(x=>x!==text);toast("♡ Quitado de favoritos")}
+ else{favorites.push(text);toast("♥ Agregado a favoritos")}
+ localStorage.setItem("piropotecaV3_fav",JSON.stringify(favorites));
+ updateStats();renderAccordions();renderAchievements();
+}
+function favoriteCurrent(){toggleFavorite(current.text)}
+function copyText(text){
+ navigator.clipboard?.writeText(text).then(()=>toast("📋 Piropo copiado"));
+}
+function copyCurrent(){if(current.text)copyText(current.text)}
+function speakCurrent(){
+ if(!current.text)return;
+ if(!("speechSynthesis" in window)){toast("Tu navegador no admite lectura en voz alta");return;}
+ speechSynthesis.cancel();
+ const utter=new SpeechSynthesisUtterance(current.text);
+ utter.lang="es-MX";
+ utter.rate=.92;
+ utter.pitch=1.03;
+ utter.onstart=()=>showSoundWave();
+ utter.onend=()=>{
+   hideSoundWave();
+   if(reactionMode==="auto"){ playReaction(reactionFor(current)); burstForCurrent(); }
+ };
+ speechSynthesis.speak(utter);
+ toast("🔊 Reproduciendo");
+}
+function reactionFor(item){
+  const c=item.category.toLowerCase();
+  const s=item.style.toLowerCase();
+  if(c.includes("chist")||s.includes("chist")||/¿eres|google|wifi|batería|promedio|tarea|examen/i.test(item.text)) return "laugh";
+  if(c.includes("atrev")||s.includes("coquet")||s.includes("atrev")) return "kiss";
+  if(c.includes("amor")||s.includes("románt")) return "kiss";
+  return "laugh";
+}
+function ensureAudio(){
+  if(!audioContext) audioContext=new (window.AudioContext||window.webkitAudioContext)();
+  if(audioContext.state==="suspended") audioContext.resume();
+}
+function playReaction(type){
+  try{
+    ensureAudio();
+    showReaction(type);
+    if(type==="kiss") playKiss();
+    else playLaugh();
+  }catch(e){toast("Tu navegador bloqueó el sonido; toca la página e inténtalo de nuevo.");}
+}
+function playKiss(){
+  const now=audioContext.currentTime;
+  const osc=audioContext.createOscillator(), gain=audioContext.createGain();
+  osc.type="sine";osc.frequency.setValueAtTime(520,now);osc.frequency.exponentialRampToValueAtTime(250,now+.16);
+  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.22,now+.025);gain.gain.exponentialRampToValueAtTime(.0001,now+.22);
+  osc.connect(gain).connect(audioContext.destination);osc.start(now);osc.stop(now+.23);
+}
+function playLaugh(){
+  const now=audioContext.currentTime;
+  [0,.13,.26,.39].forEach((d,i)=>{
+    const osc=audioContext.createOscillator(),gain=audioContext.createGain();
+    osc.type="triangle";osc.frequency.setValueAtTime(390+i*35,now+d);
+    osc.frequency.exponentialRampToValueAtTime(250+i*25,now+d+.10);
+    gain.gain.setValueAtTime(.0001,now+d);gain.gain.exponentialRampToValueAtTime(.12,now+d+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+d+.11);
+    osc.connect(gain).connect(audioContext.destination);osc.start(now+d);osc.stop(now+d+.12);
+  });
+}
+function showReaction(type){
+  const b=document.getElementById("reactionBubble");
+  b.className="reaction-bubble show "+type;
+  b.textContent=type==="kiss"?"Mua 💋":"Jajaja 😂";
+  clearTimeout(window.reactionTimer);window.reactionTimer=setTimeout(()=>b.className="reaction-bubble",2200);
+}
+function testReaction(){
+  const type=reactionFor(current);
+  try{ensureAudio();playReaction(type)}catch(e){toast("Activa el sonido del navegador para probarlo.");}
+}
+function showSoundWave(){
+  document.getElementById("displayMeta").innerHTML=`🔊 Reproduciendo <span class="sound-wave"><i></i><i></i><i></i><i></i></span>`;
+}
+function hideSoundWave(){
+  document.getElementById("displayMeta").textContent=`${DATA[current.category].emoji} ${current.category.replace(/^\\S+\\s/,"")} · ${current.style} · Intensidad ${current.level}`;
+}
+function setReactionMode(mode){
+  reactionMode=mode;localStorage.setItem("piropotecaV4_reaction",mode);
+  document.getElementById("reactionAuto").classList.toggle("active",mode==="auto");
+  document.getElementById("reactionOff").classList.toggle("active",mode==="off");
+  toast(mode==="auto"?"✨ Reacción automática activada":"🔇 Reacción desactivada");
+}
+async function shareCurrent(){
+ if(!current.text)return;
+ if(navigator.share){try{await navigator.share({title:"Piropoteca",text:current.text})}catch(e){}}
+ else{copyCurrent();toast("📤 Texto copiado para compartir")}
+}
+function filterCards(){
+ const q=document.getElementById("search").value.toLowerCase().trim();
+ document.querySelectorAll(".accordion").forEach(sec=>{
+   let visible=0;
+   sec.querySelectorAll(".card").forEach(card=>{
+     const ok=card.dataset.text.includes(q)||card.dataset.cat.toLowerCase().includes(q);
+     card.classList.toggle("hidden",!ok);if(ok)visible++;
+   });
+   sec.classList.toggle("hidden",q && visible===0);
+   if(q&&visible)sec.open=true;
+ });
+}
+function clearFilter(){document.getElementById("search").value="";document.querySelectorAll(".accordion,.card").forEach(x=>x.classList.remove("hidden"))}
+function showFavorites(){
+ document.getElementById("search").value="";
+ document.querySelectorAll(".accordion").forEach(sec=>{
+   let visible=0;
+   sec.querySelectorAll(".card").forEach(card=>{
+     const text=card.querySelector("p").textContent;
+     const ok=favorites.includes(text);card.classList.toggle("hidden",!ok);if(ok)visible++;
+   });
+   sec.classList.toggle("hidden",visible===0);if(visible)sec.open=true;
+ });
+ go("acordeones");toast(favorites.length?"⭐ Mostrando favoritos":"Aún no tienes favoritos");
+}
+function updateStats(){
+ document.getElementById("seenCount").textContent=new Set(seen).size;
+ document.getElementById("favCount").textContent=favorites.length;
+ document.getElementById("catCount").textContent=Object.keys(DATA).length;
+}
+function renderAchievements(){
+ const n=new Set(seen).size,f=favorites.length,c=Object.keys(DATA).length;
+ const items=[
+  ["🌱","Primer paso",n>=1,"Genera tu primer piropo"],
+  ["✨","Explorador",n>=10,"Descubre 10 piropos"],
+  ["🚀","Coleccionista",n>=25,"Descubre 25 piropos"],
+  ["💎","Gran colección",n>=50,"Descubre 50 piropos"],
+  ["⭐","Favorito",f>=5,"Guarda 5 favoritos"],
+  ["🧩","Multitemático",c>=10,"Explora 10 categorías"]
+ ];
+ document.getElementById("achievements").innerHTML=items.map(x=>`
+ <div class="achievement-card ${x[2]?"":"locked"}"><span style="font-size:2rem">${x[0]}</span>
+ <b>${x[1]} ${x[2]?"✓":"🔒"}</b><small>${x[3]}</small></div>`).join("");
+}
+function toggleDark(){
+ document.body.classList.toggle("dark");
+ localStorage.setItem("piropotecaV3_dark",document.body.classList.contains("dark")?"1":"0");
+ toast(document.body.classList.contains("dark")?"🌙 Modo oscuro":"☀️ Modo claro");
+}
+function go(id){document.getElementById(id).scrollIntoView({behavior:"smooth"});}
+function toast(msg){
+ const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+ clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove("show"),1700);
+}
+init();
+setReactionMode(reactionMode);
+setFX(fxEnabled);
+makeScene();
+add3DParallax();
+setupCarouselSwipe();
+carouselIndex=Math.max(0,Object.keys(DATA).indexOf(selectedCategory));
+updateCarousel();
+newPiropo();
+</script>
+
+<script>
+/* ================= V8 APP LAYER ================= */
+let v8Count=+localStorage.getItem("v8_count")||0;
+let v8Volume=localStorage.getItem("v8_volume")??.5;
+let v8Personality=localStorage.getItem("v8_personality")||"Coqueto";
+let v8Intensity=localStorage.getItem("v8_intensity")||"Medio";
+let v8Theme=localStorage.getItem("v8_theme")||"pastel";
+let v8Deferred=null;
+const v8Personalities=["Romántico","Tierno","Chistoso","Coqueto","Intelectual","Seguro"];
+const v8Intensities=["Suave","Medio","Atrevido"];
+
+function v8Toast(t){
+  const x=document.getElementById("v8Toast");x.textContent=t;x.classList.add("show");
+  clearTimeout(window.v8ToastTimer);window.v8ToastTimer=setTimeout(()=>x.classList.remove("show"),2200);
+}
+function v8Init(){
+  v8RenderPills();v8SetTheme(v8Theme);document.getElementById("v8Volume").value=v8Volume;
+  v8RenderStats();v8RenderAchievements();v8RenderFavorites();v8Matrix();
+  window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();v8Deferred=e;document.getElementById("v8InstallBtn").classList.add("show")});
+  document.getElementById("v8Theme").value=v8Theme;
+}
+function v8RenderPills(){
+  document.getElementById("v8Personality").innerHTML=v8Personalities.map(x=>`<button class="v8-pill ${x===v8Personality?"active":""}" onclick="v8SetPersonality('${x}')">${x}</button>`).join("");
+  document.getElementById("v8Intensity").innerHTML=v8Intensities.map(x=>`<button class="v8-pill ${x===v8Intensity?"active":""}" onclick="v8SetIntensity('${x}')">${x}</button>`).join("");
+}
+function v8SetPersonality(x){v8Personality=x;localStorage.setItem("v8_personality",x);v8RenderPills();v8Generate();v8Toast("🎭 "+x)}
+function v8SetIntensity(x){v8Intensity=x;localStorage.setItem("v8_intensity",x);v8RenderPills();v8Generate();v8Toast("🔥 Intensidad "+x)}
+function v8SetTheme(x){
+  v8Theme=x;localStorage.setItem("v8_theme",x);
+  const themes={
+    pastel:["#e9a9c7","#cbb7ef"],ocean:["#91cbe2","#9ab6e6"],mint:["#9ed7bf","#b5dfd5"],
+    space:["#8878c9","#4d5c9f"],science:["#87cfc1","#8cbce2"],neon:["#ff8acb","#8d7cff"]
+  };
+  const [a,b]=themes[x]||themes.pastel;
+  document.documentElement.style.setProperty("--v8-accent",a);
+  document.documentElement.style.setProperty("--v8-accent2",b);
+  document.documentElement.style.setProperty("--accent",a);
+  v8Toast("🎨 Tema cambiado");
+}
+function v8Generate(){
+  if(typeof newPiropo==="function") newPiropo();
+  v8Count++;localStorage.setItem("v8_count",v8Count);v8RenderStats();
+  v8AchievementCheck();v8UpdateCard();
+  if(window.fxEnabled!==false && typeof burstForCurrent==="function") burstForCurrent();
+}
+function v8RandomTheme(){
+  const a=["pastel","ocean","mint","space","science","neon"];
+  v8SetTheme(a[Math.floor(Math.random()*a.length)]);
+}
+function v8Roulette(){
+  const keys=Object.keys(DATA||{});
+  if(!keys.length)return;
+  const wheel=document.getElementById("v8Wheel");
+  wheel.classList.remove("spin");void wheel.offsetWidth;wheel.classList.add("spin");
+  const key=keys[Math.floor(Math.random()*keys.length)];
+  setTimeout(()=>{
+    const idx=keys.indexOf(key);
+    if(typeof selectCarouselCategory==="function")selectCarouselCategory(idx);
+    document.getElementById("v8WheelResult").textContent="🎯 "+key;
+    v8Count++;localStorage.setItem("v8_count",v8Count);v8RenderStats();v8AchievementCheck();
+    if(typeof burstForCurrent==="function")burstForCurrent();
+  },1450);
+}
+function v8RenderStats(){
+  const favs=JSON.parse(localStorage.getItem("favorites")||localStorage.getItem("piropoteca_favorites")||"[]");
+  document.getElementById("v8Count").textContent=v8Count;
+  document.getElementById("v8Fav").textContent=favs.length||0;
+  const unlocked=JSON.parse(localStorage.getItem("v8_achievements")||"[]");
+  document.getElementById("v8Ach").textContent=unlocked.length;
+  document.getElementById("v8Streak").textContent=Math.min(7,Math.floor(v8Count/5));
+}
+function v8AchievementData(){
+ return [
+  ["🌱","Primer paso",1,"Genera tu primer piropo."],
+  ["🔥","Calentando motores",10,"Genera 10 piropos."],
+  ["💎","Coleccionista",25,"Genera 25 piropos."],
+  ["🚀","Explorador",50,"Genera 50 piropos."],
+  ["👑","Maestro",100,"Genera 100 piropos."],
+  ["❤️","Romántico",1,"Guarda al menos un favorito."],
+  ["🎭","Multitalento",3,"Usa 3 personalidades diferentes."]
+ ];
+}
+function v8AchievementCheck(){
+ const data=v8AchievementData(),un=JSON.parse(localStorage.getItem("v8_achievements")||"[]");
+ const favs=JSON.parse(localStorage.getItem("favorites")||localStorage.getItem("piropoteca_favorites")||"[]");
+ data.forEach((a,i)=>{
+   let ok=(i===0&&v8Count>=1)||(i===1&&v8Count>=10)||(i===2&&v8Count>=25)||(i===3&&v8Count>=50)||(i===4&&v8Count>=100)||(i===5&&favs.length>=1);
+   if(ok&&!un.includes(i)){un.push(i);v8Toast("🏆 Logro desbloqueado: "+a[1])}
+ });
+ localStorage.setItem("v8_achievements",JSON.stringify(un));v8RenderAchievements();v8RenderStats();
+}
+function v8RenderAchievements(){
+ const un=JSON.parse(localStorage.getItem("v8_achievements")||"[]"),data=v8AchievementData();
+ document.getElementById("v8Achievements").innerHTML=data.map((a,i)=>`<div class="v8-achievement ${un.includes(i)?"":"locked"}"><span class="icon">${a[0]}</span><div><b>${a[1]}</b><br><small>${a[3]}</small></div></div>`).join("");
+}
+function v8ReadFavs(){
+ try{return JSON.parse(localStorage.getItem("favorites")||localStorage.getItem("piropoteca_favorites")||"[]")}catch{return[]}
+}
+function v8RenderFavorites(){
+ const box=document.getElementById("v8Favorites"),q=(document.getElementById("v8FavSearch").value||"").toLowerCase();
+ const favs=v8ReadFavs().filter(x=>JSON.stringify(x).toLowerCase().includes(q)).slice(0,12);
+ box.innerHTML=favs.length?favs.map((x,i)=>{
+   const text=typeof x==="string"?x:(x.text||x.phrase||JSON.stringify(x));
+   return `<div class="v8-achievement"><span class="icon">❤️</span><div style="flex:1">${text}</div></div>`
+ }).join(""):"<small>Aún no hay favoritos que coincidan.</small>";
+}
+function v8UpdateCard(){
+ const p=document.querySelector("#v8CardPreview p");
+ if(p&&typeof current!=="undefined")p.textContent=current.text||"Genera un piropo para crear tu tarjeta.";
+}
+function v8ShowCard(){
+ document.getElementById("v8CardMaker").style.display="block";v8UpdateCard();
+ document.getElementById("v8CardMaker").scrollIntoView({behavior:"smooth",block:"center"});
+}
+async function v8CopyCard(){
+ const text=(typeof current!=="undefined"&&current.text)?current.text:"";
+ try{await navigator.clipboard.writeText(text);v8Toast("📋 Copiado")}catch{v8Toast("Selecciona y copia el texto")}
+}
+async function v8ShareCard(){
+ const text=(typeof current!=="undefined"&&current.text)?current.text:"";
+ if(navigator.share){try{await navigator.share({title:"Piropoteca",text});}catch{}}
+ else v8CopyCard();
+}
+function v8Matrix(){
+ const box=document.getElementById("v8Code");
+ const chars="01{}[]<>/;=+-*const let if else =>";
+ setInterval(()=>{
+   if(!box)return;
+   let s="";
+   for(let i=0;i<65;i++)s+=chars[Math.floor(Math.random()*chars.length)];
+   box.innerHTML=`<span>${s}</span>`;
+ },1700);
+}
+async function v8Install(){
+ if(!v8Deferred){v8Toast("📲 Para instalarla, ábrela desde un sitio HTTPS o un servidor local.");return}
+ v8Deferred.prompt();await v8Deferred.userChoice;v8Deferred=null;
+}
+document.addEventListener("DOMContentLoaded",v8Init);
+</script>
+
+<script>
+/* ================= V9 AUTOMATIC CAROUSEL + FUN ================= */
+let v9Auto=true;
+let v9Speed=5000;
+let v9Timer=null;
+let v9MoodIndex=0;
+let v9DailyDate=localStorage.getItem("v9_daily_date")||"";
+
+function v9StartAuto(){
+  clearInterval(v9Timer);
+  if(!v9Auto)return;
+  v9Timer=setInterval(()=>{
+    if(typeof moveCarousel==="function") moveCarousel(1);
+  },v9Speed);
+}
+function v9ToggleAuto(){
+  v9Auto=!v9Auto;
+  const b=document.getElementById("v9AutoToggle");
+  b.classList.toggle("on",v9Auto);
+  v9StartAuto();
+  if(typeof v9Toast==="function")v9Toast(v9Auto?"🎠 Carrusel automático activado":"⏸️ Carrusel pausado");
+}
+function v9SetSpeed(sec){
+  v9Speed=Number(sec)*1000;
+  v9StartAuto();
+  if(typeof v9Toast==="function")v9Toast("⚡ Velocidad: "+sec+" segundos");
+}
+function v9PauseOnInteraction(){
+  const vp=document.getElementById("carouselViewport");
+  if(!vp)return;
+  ["mouseenter","touchstart","pointerdown"].forEach(ev=>vp.addEventListener(ev,()=>clearInterval(v9Timer),{passive:true}));
+  ["mouseleave","touchend","pointerup"].forEach(ev=>vp.addEventListener(ev,()=>{if(v9Auto)v9StartAuto()},{passive:true}));
+}
+function v9Surprise(){
+  const options=[
+    "💗 Hoy la química entre ustedes está en equilibrio perfecto.",
+    "🧪 Resultado: reacción exotérmica de sonrisas.",
+    "📐 Tu nivel de encanto tiende a infinito.",
+    "⚙️ Ingeniería detectó una falla: faltó una pieza… tú.",
+    "💻 Sistema actualizado: se encontró una persona increíble.",
+    "🚀 Despegue autorizado: destino, una sonrisa.",
+    "😂 Error 404: seriedad no encontrada.",
+    "🌈 Has desbloqueado una frase secreta."
+  ];
+  const t=options[Math.floor(Math.random()*options.length)];
+  document.getElementById("v9Result").textContent=t;
+  v9Bubbles(["✨","💖","🎉","⭐","💫"]);
+}
+function v9Mood(){
+  const moods=[
+    ["😊","Tienes vibra de piropo tierno."],
+    ["😎","Modo seguro activado: hoy toca brillar."],
+    ["🤓","Modo intelectual: usa un piropo con ciencia."],
+    ["😂","Modo chistoso: cuidado, podrías provocar una carcajada."],
+    ["💗","Modo romántico: corazones preparados."]
+  ];
+  const m=moods[v9MoodIndex++%moods.length];
+  document.getElementById("v9Result").textContent=m[0]+" "+m[1];
+  v9Bubbles([m[0],"✨","💗"]);
+}
+function v9EmojiStorm(){
+  v9Bubbles(["💗","💖","💕","✨","😂","🧪","⚙️","📐","🚀","🌸","⭐","🎉"],26);
+  document.getElementById("v9Result").textContent="🌪️ ¡Tormenta de emojis!";
+}
+function v9Bubbles(arr,count=14){
+  if(window.fxEnabled===false)return;
+  for(let i=0;i<count;i++){
+    const b=document.createElement("span");b.className="v9-bubble";
+    b.textContent=arr[Math.floor(Math.random()*arr.length)];
+    b.style.left=(Math.random()*100)+"vw";b.style.bottom="-30px";
+    b.style.setProperty("--x",(Math.random()*260-130)+"px");
+    b.style.setProperty("--r",(Math.random()*80-40)+"deg");
+    b.style.animationDelay=(Math.random()*.45)+"s";
+    document.body.appendChild(b);setTimeout(()=>b.remove(),2900);
+  }
+}
+function v9Daily(){
+  const today=new Date().toISOString().slice(0,10);
+  let seed=0;for(const c of today)seed=(seed*31+c.charCodeAt(0))>>>0;
+  const keys=Object.keys(DATA||{});
+  if(!keys.length)return;
+  const k=keys[seed%keys.length];
+  const arr=DATA[k].phrases||[];
+  const p=arr[seed%arr.length];
+  document.getElementById("v9Result").textContent=(DATA[k].emoji||"✨")+" "+p;
+  if(v9DailyDate!==today){v9DailyDate=today;localStorage.setItem("v9_daily_date",today);v9Bubbles(["🌟","💗","✨"],10)}
+}
+function v9Measure(){
+  const value=45+Math.floor(Math.random()*56);
+  document.getElementById("v9MeterText").textContent="Compatibilidad científica: "+value+"%";
+  document.getElementById("v9MeterBar").style.width=value+"%";
+  document.getElementById("v9Result").textContent=value>85?"💥 ¡Reacción espectacular!":value>65?"🧪 Reacción muy prometedora.":"🔬 Hace falta otra medición.";
+  v9Bubbles(value>75?["💖","🧪","✨"]:["🔬","📐","✨"]);
+}
+function v9Detective(){
+  if(typeof current==="undefined"){return}
+  const t=(current.text||"").toLowerCase();
+  let area="✨ creatividad";
+  if(/quím|átomo|mol|reacción|ácido|base/.test(t))area="🧪 química";
+  else if(/pi|número|infin|ecuación|suma|raíz/.test(t))area="📐 matemáticas";
+  else if(/código|program|sistema|bug|app/.test(t))area="💻 sistemas";
+  else if(/motor|engrane|ingenier|máquina/.test(t))area="⚙️ ingeniería";
+  document.getElementById("v9Result").textContent="🔎 El detective detectó: "+area;
+  v9Bubbles(["🔎","✨","🧠"]);
+}
+function v9Challenge(){
+  const challenges=[
+    "🎯 Genera un piropo de química y léelo en voz alta.",
+    "🎯 Cambia a Matemáticas y encuentra tu frase favorita.",
+    "🎯 Guarda 3 favoritos.",
+    "🎯 Prueba una personalidad que nunca hayas usado.",
+    "🎯 Explora 5 categorías del carrusel.",
+    "🎯 Crea una tarjeta y compártela."
+  ];
+  document.getElementById("v9Challenge").textContent=challenges[Math.floor(Math.random()*challenges.length)];
+}
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(()=>{
+    v9PauseOnInteraction();
+    v9StartAuto();
+  },300);
+});
+
+/* Make the existing generator refresh V8 card and V9 effects when available. */
+const v9OriginalNewPiropo = window.newPiropo;
+if(typeof v9OriginalNewPiropo==="function"){
+  window.newPiropo=function(){
+    const result=v9OriginalNewPiropo.apply(this,arguments);
+    setTimeout(()=>{if(typeof v8UpdateCard==="function")v8UpdateCard();},40);
+    return result;
+  }
+}
+</script>
+
+<script>
+/* ================= V10 EXPERIENCE ================= */
+let v10Slides=[
+ ["✨ PIROPOTECA","Una experiencia web interactiva que combina creatividad, ciencia, tecnología, humor y diseño responsive."],
+ ["🎠 CARRUSEL","Las categorías cambian automáticamente y también pueden explorarse con gestos, flechas y teclado."],
+ ["🧪 LABORATORIO","El usuario puede mezclar temas para crear una experiencia diferente."],
+ ["🧬 ADN","Cada piropo puede visualizarse mediante porcentajes de romance, humor, ciencia y atrevimiento."],
+ ["🎮 GAMIFICACIÓN","Los usuarios ganan experiencia, desbloquean niveles y descubren secretos."],
+ ["🌌 UNIVERSO","Las categorías se transforman en planetas interactivos."],
+ ["🎓 CONCLUSIÓN","Piropoteca demuestra cómo HTML, CSS y JavaScript pueden convertirse en una experiencia interactiva."]
+];
+let v10SlideIndex=0;
+
+function v10StartExperience(){
+  document.getElementById("v10Welcome")?.scrollIntoView({behavior:"smooth"});
+  v10Bubbles(["✨","💗","🧪","🚀","⭐"],18);
+  if(typeof v8Generate==="function")setTimeout(v8Generate,450);
+}
+function v10Mix(){
+  const results=[
+    "🧪💗 Reacción romántica: alta concentración de sonrisas.",
+    "⚗️😂 Fórmula obtenida: 50% ciencia + 50% buen humor.",
+    "💗🧪 Resultado: una reacción que no necesita catalizador.",
+    "✨⚙️ Mezcla estable: creatividad + ingeniería + encanto.",
+    "📐💗 Ecuación resultante: tú + sonrisa = ∞."
+  ];
+  document.getElementById("v10MixResult").textContent=results[Math.floor(Math.random()*results.length)];
+  v10Bubbles(["⚗️","🧪","💗","✨"],16);
+  if(typeof v8Generate==="function")v8Generate();
+}
+function v10AnalyzeDNA(){
+  const vals=[35+Math.floor(Math.random()*66),25+Math.floor(Math.random()*76),30+Math.floor(Math.random()*71),20+Math.floor(Math.random()*81)];
+  const labels=["💗 Romance","😂 Humor","🧪 Ciencia","🔥 Atrevimiento"];
+  document.getElementById("v10DNA").innerHTML=labels.map((l,i)=>`<div><small>${l}: ${vals[i]}%</small><div class="v10-bar"><i style="width:${vals[i]}%"></i></div></div>`).join("");
+}
+function v10UpdateLevel(){
+  const count=typeof v8Count!=="undefined"?v8Count:0;
+  const levels=[
+    [0, "🌱","Curioso"],[10,"🔎","Explorador"],[25,"🧪","Científico"],
+    [50,"⚙️","Ingeniero"],[100,"👑","Maestro del Piropo"],[200,"🚀","Leyenda"]
+  ];
+  let cur=levels[0],next=levels[1];
+  for(let i=0;i<levels.length;i++){if(count>=levels[i][0])cur=levels[i];if(count<levels[i][0]){next=levels[i];break}}
+  document.getElementById("v10LevelIcon").textContent=cur[1];
+  document.getElementById("v10Level").textContent=cur[2];
+  const base=cur[0],target=next?next[0]:base+100;
+  const pct=next?Math.min(100,((count-base)/(target-base))*100):100;
+  document.getElementById("v10XP").style.width=pct+"%";
+  document.getElementById("v10LevelText").textContent=next?`${target-count} piropos para ${next[2]}.`:"¡Nivel máximo alcanzado!";
+  const secret=document.getElementById("v10Secret");
+  if(count>=25){secret.classList.remove("locked");secret.textContent="🔓 Has desbloqueado: “La química no es lo único que puede provocar una reacción.”";}
+}
+function v10Slots(){
+  const icons=["🧪","💗","😂","📐","⚙️","💻","🚀","✨","🌟","🎮"];
+  const reels=[1,2,3].map(i=>document.getElementById("v10R"+i));
+  reels.forEach(x=>x.classList.add("v10-spin"));
+  setTimeout(()=>{
+    const a=reels.map(x=>icons[Math.floor(Math.random()*icons.length)]);
+    reels.forEach((x,i)=>{x.classList.remove("v10-spin");x.textContent=a[i]});
+    const unique=new Set(a).size;
+    document.getElementById("v10SlotResult").textContent=unique===1?"🎉 ¡TRIPLE! Combinación perfecta.":unique===2?"✨ ¡Doble combinación!":"🎲 Nueva combinación desbloqueada.";
+    v10Bubbles(["🎰","✨","🎉","⭐"],12);
+  },900);
+}
+function v10Planet(name){
+  document.getElementById("v10PlanetResult").textContent="🪐 Explorando "+name+"...";
+  v10Bubbles(["🌌","⭐","✨"],10);
+}
+function v10Map(name){
+  document.getElementById("v10MapResult").textContent="🗺️ Ruta seleccionada: "+name;
+}
+function v10SyncPhoto(){
+  const p=document.getElementById("v10PhotoText");
+  const c=document.getElementById("v10PhotoCategory");
+  if(typeof current!=="undefined"&&current.text){
+    p.textContent=current.text;
+    c.textContent=(typeof selectedCategory!=="undefined"?selectedCategory:"Piropoteca")+" · Piropoteca";
+  }
+  v10UpdateLevel();
+}
+function v10PhotoCopy(){
+  const t=document.getElementById("v10PhotoText").textContent;
+  navigator.clipboard?.writeText(t);if(typeof v9Toast==="function")v9Toast("📋 Tarjeta copiada");
+}
+async function v10PhotoShare(){
+  const t=document.getElementById("v10PhotoText").textContent;
+  if(navigator.share){try{await navigator.share({title:"Piropoteca",text:t})}catch{}}
+  else v10PhotoCopy();
+}
+function v10Presentation(){document.getElementById("v10Presentation").classList.add("show");v10SlideIndex=0;v10RenderSlide()}
+function v10ClosePresentation(){document.getElementById("v10Presentation").classList.remove("show")}
+function v10NextSlide(){
+  v10SlideIndex++;
+  if(v10SlideIndex>=v10Slides.length){v10ClosePresentation();return}
+  v10RenderSlide();
+}
+function v10RenderSlide(){
+  const s=v10Slides[v10SlideIndex],box=document.getElementById("v10Slide");
+  box.innerHTML=`<div style="font-size:3rem">✨🧪💗⚙️📐💻</div><h1>${s[0]}</h1><p>${s[1]}</p><button class="v10-start" onclick="v10NextSlide()">${v10SlideIndex===v10Slides.length-1?"Finalizar":"Siguiente →"}</button>`;
+}
+function v10Stars(){
+  const u=document.getElementById("v10Universe");if(!u)return;
+  for(let i=0;i<55;i++){
+    const s=document.createElement("span");s.className="v10-star";
+    s.style.left=Math.random()*100+"%";s.style.top=Math.random()*100+"%";
+    s.style.animationDelay=Math.random()*2+"s";u.appendChild(s);
+  }
+}
+const v10OldGenerate=window.v8Generate;
+window.v8Generate=function(){
+  if(typeof v10OldGenerate==="function")v10OldGenerate();
+  setTimeout(()=>{v10SyncPhoto();v10AnalyzeDNA()},80);
+};
+document.addEventListener("DOMContentLoaded",()=>{
+  v10Stars();v10AnalyzeDNA();v10UpdateLevel();v10SyncPhoto();
+});
+</script>
+
+<script>
+/* ================= V11 ALL FEATURES ================= */
+const v11Cats=["💗 Amor","🧪 Química","📐 Matemáticas","⚙️ Ingeniería","💻 Sistemas","🚀 Espacio","😂 Chistoso","🌟 Sorpresa"];
+let v11Rotation=0,v11Spinning=false,v11CardCount=0,v11SecretCount=0;
+
+const v11Phrases={
+"💗 Amor":["Si fueras una constante, serías la que hace que todo tenga sentido.","No necesito coordenadas para saber dónde quiero estar: cerca de tu sonrisa."],
+"🧪 Química":["Eres como una reacción perfecta: haces que todo cambie para mejor.","Entre todos los elementos, tú eres mi reacción favorita."],
+"📐 Matemáticas":["Tu sonrisa tiende a infinito y yo no quiero calcular el límite.","Si fueras una ecuación, siempre buscaría la solución."],
+"⚙️ Ingeniería":["Mi sistema tiene un pequeño error: cada vez que apareces, se detiene por un segundo.","No necesito planos para saber que tu sonrisa tiene una estructura perfecta."],
+"💻 Sistemas":["Eres el único proceso que quiero mantener ejecutándose.","Error 404: no encontré una explicación para lo genial que eres."],
+"🚀 Espacio":["Si fueras un planeta, tendría mi órbita alrededor de tu sonrisa.","Contigo hasta perderse en el universo suena como un buen plan."],
+"😂 Chistoso":["No soy calculadora, pero contigo siempre me salen sonrisas.","Mi cerebro hizo buffering cuando apareciste."],
+"🌟 Sorpresa":["Resultado inesperado: una sonrisa apareció sin previo aviso."]
+};
+function v11Pick(cat){
+  const arr=v11Phrases[cat]||v11Phrases["🌟 Sorpresa"];
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+function v11SmartGenerate(){
+  let cat=document.getElementById("v11Cat").value;
+  if(cat==="auto")cat=v11Cats[Math.floor(Math.random()*v11Cats.length)];
+  const person=document.getElementById("v11Person").value;
+  const style=document.getElementById("v11Style").value;
+  const intensity=document.getElementById("v11Intensity").value;
+  let p=v11Pick(cat);
+  if(style.includes("Chistoso")&&!p.includes("😂"))p+=" 😄";
+  if(intensity.includes("Atrevido")||intensity.includes("Alto"))p+=" ✨";
+  document.getElementById("v11SmartResult").textContent=p;
+  v11SecretCount++;v11Bubbles(["✨","💗","🧪","⭐"],12);
+  v11DrawCard(false,cat,p);
+  v11UpdateV10Count();
+}
+function v11Spin(){
+  if(v11Spinning)return;
+  v11Spinning=true;
+  const wheel=document.getElementById("v11Wheel");
+  const index=Math.floor(Math.random()*v11Cats.length);
+  const slice=360/v11Cats.length;
+  const target=360*6+(360-(index*slice+slice/2));
+  v11Rotation+=target;
+  wheel.style.transform=`rotate(${v11Rotation}deg)`;
+  setTimeout(()=>{
+    const cat=v11Cats[index];
+    document.getElementById("v11WheelResult").textContent="🎉 Resultado: "+cat;
+    v11Spinning=false;
+    v11SecretCount++;
+    v11Bubbles(["🎡","✨","🎉"],16);
+    const catSelect=document.getElementById("v11Cat");
+    [...catSelect.options].forEach(o=>{if(o.text===cat)o.selected=true});
+    v11SmartGenerate();
+  },4100);
+}
+function v11Hybrid(){
+  const a=document.getElementById("v11MixA").value,b=document.getElementById("v11MixB").value;
+  const combos={
+   "🧪 Química|💗 Amor":"🧪💗 Reacción romántica detectada: tu sonrisa funciona como catalizador.",
+   "📐 Matemáticas|💗 Amor":"📐💗 Tu sonrisa es una variable que siempre hace crecer mi felicidad.",
+   "💻 Sistemas|💗 Amor":"💻💗 Conexión establecida: corazón.exe está funcionando correctamente.",
+   "⚙️ Ingeniería|💗 Amor":"⚙️💗 Diseño aprobado: una sonrisa así merece ingeniería de alto nivel.",
+   "🚀 Espacio|💗 Amor":"🚀💗 Mi órbita favorita acaba de cambiar de dirección.",
+   "🧪 Química|😂 Humor":"🧪😂 Reacción inesperada: apareció una sonrisa.",
+   "📐 Matemáticas|😂 Humor":"📐😂 La probabilidad de que esto provoque una risa acaba de aumentar.",
+   "💻 Sistemas|😂 Humor":"💻😂 Error 200: solicitud de carcajada completada."
+  };
+  const key=a+"|"+b,rev=b+"|"+a;
+  const result=combos[key]||combos[rev]||`⚗️ Experimento ${a} + ${b}: combinación descubierta.`;
+  document.getElementById("v11HybridResult").textContent=result;
+  v11Bubbles(["⚗️","💥","✨"],18);
+}
+function v11DrawCard(count=true,cat=null,text=null){
+  if(count)v11CardCount++;
+  cat=cat||v11Cats[Math.floor(Math.random()*v11Cats.length)];
+  text=text||v11Pick(cat);
+  const rarities=["Común","Rara","Épica","Legendaria"];
+  const rarity=rarities[Math.floor(Math.random()*rarities.length)];
+  document.getElementById("v11CardTitle").textContent=cat+" · "+(cat.includes("Química")?"Alquimista":"Explorador");
+  document.getElementById("v11CardRarity").textContent="⭐ "+rarity;
+  document.getElementById("v11CardText").textContent=text;
+  if(v11CardCount>=5)document.getElementById("v11Egg").textContent="🥚 Easter egg: ya tienes 5 cartas. ¡Sigue explorando!";
+}
+function v11EggHunt(){
+  v11SecretCount++;
+  const eggs=[
+   "🥚 Encontraste el huevo: combinación secreta activada.",
+   "🔐 Secreto: prueba Química + Amor en Experimentos.",
+   "🌟 Secreto: genera 10 frases para desbloquear una sorpresa.",
+   "🧠 Secreto: el modo código tiene un mensaje oculto.",
+   "🎉 ¡Easter egg encontrado! Tu curiosidad subió de nivel."
+  ];
+  document.getElementById("v11Egg").textContent=eggs[Math.floor(Math.random()*eggs.length)];
+  v11Bubbles(["🥚","🔐","✨"],12);
+}
+function v11CodeMode(){
+  const box=document.getElementById("v11Code");
+  const lines=[
+   "> boot_piropoteca();",
+   "> loading_categories...[OK]",
+   "> loading_effects...[OK]",
+   "> loading_humor...[OK]",
+   "> heart_connection = TRUE;",
+   "> reaction_status = EXOTHERMIC;",
+   "> result = 'SONRISA DETECTADA';",
+   "> SYSTEM_READY ❤️"
+  ];
+  box.textContent="";
+  lines.forEach((line,i)=>setTimeout(()=>box.textContent+=line+"\n",i*260));
+}
+function v11Game(type){
+  if(type==="memory")document.getElementById("v11GameResult").textContent="🧠 Memoriza: 🧪 💗 📐 ⚙️. Ahora intenta recordarlos en orden.";
+  if(type==="guess"){
+    const cat=v11Cats[Math.floor(Math.random()*v11Cats.length)];
+    document.getElementById("v11GameResult").textContent="🔮 Pista: esta categoría tiene relación con "+cat.split(" ")[1]+". ¡Adivínala!";
+  }
+  if(type==="formula")document.getElementById("v11GameResult").textContent="🧪 Fórmula sorpresa: H₂O + ✨ + 😄 = 💗";
+}
+function v11UpdateV10Count(){
+  try{if(typeof v8Count!=="undefined")v8Count++; if(typeof v10UpdateLevel==="function")v10UpdateLevel()}catch(e){}
+}
+
+/* Patch the existing generator if present so the V11 dashboard stays synchronized. */
+const v11OriginalGenerate=window.v8Generate;
+if(typeof v11OriginalGenerate==="function"){
+  window.v8Generate=function(){
+    v11OriginalGenerate.apply(this,arguments);
+    setTimeout(()=>{try{v11DrawCard(false);v10SyncPhoto?.();v10AnalyzeDNA?.()}catch(e){}},100);
+  };
+}
+</script>
+
+<script>
+/* ================= V12 FLUID CAROUSEL PATCH ================= */
+(function(){
+  const vp = document.getElementById("carouselViewport");
+  const track = document.getElementById("carouselTrack");
+  if(!vp || !track) return;
+
+  let dragging=false, moved=false, startX=0, startY=0, baseTransform="";
+  let raf=0, lastDx=0, pointerId=null;
+  let savedAuto = true;
+
+  function pauseAuto(){
+    if(typeof v9Timer!=="undefined"){ clearInterval(v9Timer); }
+  }
+  function resumeAuto(){
+    if(typeof v9Auto!=="undefined" && v9Auto && typeof v9StartAuto==="function"){
+      v9StartAuto();
+    }
+  }
+  function currentTranslateX(){
+    const m = new DOMMatrixReadOnly(getComputedStyle(track).transform);
+    return m.m41 || 0;
+  }
+
+  function onDown(e){
+    if(e.pointerType==="mouse" && e.button!==0) return;
+    dragging=true; moved=false; pointerId=e.pointerId;
+    startX=e.clientX; startY=e.clientY;
+    lastDx=0; baseTransform=getComputedStyle(track).transform;
+    pauseAuto();
+    vp.classList.add("v12-dragging");
+    try{vp.setPointerCapture(pointerId)}catch(_){}
+  }
+
+  function onMove(e){
+    if(!dragging || e.pointerId!==pointerId) return;
+    const dx=e.clientX-startX, dy=e.clientY-startY;
+    if(!moved && Math.abs(dx)<8 && Math.abs(dy)<8) return;
+
+    // If the gesture is primarily vertical, let the page scroll naturally.
+    if(!moved && Math.abs(dy)>Math.abs(dx)){
+      dragging=false;
+      vp.classList.remove("v12-dragging");
+      resumeAuto();
+      return;
+    }
+    moved=true;
+    lastDx=dx;
+    if(raf) return;
+    raf=requestAnimationFrame(()=>{
+      raf=0;
+      const x=currentTranslateX();
+      track.style.transition="none";
+      track.style.transform=`translate3d(${x+lastDx}px,0,0)`;
+    });
+  }
+
+  function onUp(e){
+    if(!dragging || (pointerId!==null && e.pointerId!==pointerId)) return;
+    dragging=false;
+    vp.classList.remove("v12-dragging");
+    try{vp.releasePointerCapture(pointerId)}catch(_){}
+    pointerId=null;
+    if(raf){cancelAnimationFrame(raf);raf=0;}
+
+    // Restore the carousel's normal transform/transition by asking its existing
+    // navigation logic to snap exactly one card.
+    if(moved){
+      const threshold=Math.max(45, vp.clientWidth*0.16);
+      if(lastDx < -threshold){
+        if(typeof moveCarousel==="function") moveCarousel(1);
+      }else if(lastDx > threshold){
+        if(typeof moveCarousel==="function") moveCarousel(-1);
+      }else{
+        // Re-snap to the current card without changing index.
+        if(typeof updateCarousel==="function") updateCarousel();
+        else if(typeof updateCarouselPosition==="function") updateCarouselPosition();
+        else if(typeof moveCarousel==="function") moveCarousel(0);
+      }
+    }else{
+      if(typeof updateCarousel==="function") updateCarousel();
+      else if(typeof updateCarouselPosition==="function") updateCarouselPosition();
+    }
+    setTimeout(resumeAuto, 120);
+  }
+
+  // Avoid duplicate touch listeners from older handlers by using pointer events only.
+  vp.addEventListener("pointerdown", onDown, {passive:true});
+  vp.addEventListener("pointermove", onMove, {passive:true});
+  vp.addEventListener("pointerup", onUp, {passive:true});
+  vp.addEventListener("pointercancel", onUp, {passive:true});
+
+  // Keep wheel/arrow behavior smooth and prevent accidental page scrolling on horizontal wheel.
+  vp.addEventListener("wheel", function(e){
+    if(Math.abs(e.deltaX)>Math.abs(e.deltaY)){
+      e.preventDefault();
+      pauseAuto();
+      if(e.deltaX>18 && typeof moveCarousel==="function") moveCarousel(1);
+      if(e.deltaX<-18 && typeof moveCarousel==="function") moveCarousel(-1);
+      setTimeout(resumeAuto,500);
+    }
+  }, {passive:false});
+
+  // Ensure autoplay never fights with a gesture.
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden) pauseAuto(); else resumeAuto();
+  });
+})();
+</script>
+<script>
+/* V13: evita que las secciones se carguen/aparezcan al hacer scroll */
+(function(){
+  function prepararPagina(){
+    document.documentElement.classList.add("v13-ready");
+
+    document.querySelectorAll("section,.v8-section,.v8-card,.carousel-card,.carousel-item")
+      .forEach(function(el){
+        el.style.contentVisibility="visible";
+        el.style.visibility="visible";
+      });
+
+    document.querySelectorAll("img").forEach(function(img){
+      img.loading="eager";
+      img.decoding="sync";
+      img.removeAttribute("loading");
+    });
+
+    /* Precalienta el layout completo antes de que el usuario empiece a navegar. */
+    void document.body.offsetHeight;
+    document.querySelectorAll("section").forEach(function(el){
+      void el.offsetTop;
+      void el.offsetHeight;
+    });
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",prepararPagina,{once:true});
+  }else{
+    prepararPagina();
+  }
+
+  window.addEventListener("load",prepararPagina,{once:true});
+})();
+</script>
+<script>
+/* ================= V14 CASINO + RULETA + PERFORMANCE ================= */
+(function(){
+  const symbols=["🧪","💗","😂","📐","⚙️","💻","🚀","✨","🌟","🎮"];
+  const cats=["💗 Amor","🧪 Química","📐 Matemáticas","⚙️ Ingeniería","💻 Sistemas","🚀 Espacio","😂 Chistoso","🌟 Sorpresa"];
+  let slotBusy=false, wheelBusy=false, wheelRot=0;
+
+  function fillReel(id){
+    const el=document.getElementById(id); if(!el)return;
+    const seq=[];
+    for(let i=0;i<16;i++) seq.push(symbols[i%symbols.length]);
+    el.innerHTML=seq.map(s=>`<div class="v14-symbol">${s}</div>`).join("");
+  }
+  ["v14Reel1","v14Reel2","v14Reel3"].forEach(fillReel);
+
+  function spinOne(id, finalIndex, duration){
+    const el=document.getElementById(id);
+    const item=125;
+    const loops=6+Math.floor(Math.random()*3);
+    const y=-(loops*symbols.length+finalIndex)*item+35;
+    el.style.transition=`transform ${duration}ms cubic-bezier(.12,.76,.16,1)`;
+    el.style.transform=`translate3d(0,${y}px,0)`;
+  }
+
+  window.v14SpinSlots=function(){
+    if(slotBusy)return;
+    slotBusy=true;
+    const btn=document.getElementById("v14SlotBtn");
+    btn.disabled=true;
+    document.getElementById("v14SlotResult").textContent="🎰 Girando...";
+    const finals=[0,0,0].map(()=>Math.floor(Math.random()*symbols.length));
+    spinOne("v14Reel1",finals[0],1700);
+    setTimeout(()=>spinOne("v14Reel2",finals[1],2100),120);
+    setTimeout(()=>spinOne("v14Reel3",finals[2],2500),240);
+    setTimeout(()=>{
+      const out=finals.map(i=>symbols[i]);
+      const text=(out[0]===out[1]&&out[1]===out[2])
+        ?"🎉 ¡TRIPLE! Combinación perfecta."
+        :(out[0]===out[1]||out[1]===out[2]||out[0]===out[2])
+        ?"✨ ¡DOBLE! Dos símbolos coinciden."
+        :"🎲 Nueva combinación: "+out.join(" ");
+      document.getElementById("v14SlotResult").textContent=text;
+      slotBusy=false;btn.disabled=false;
+      if(typeof v10Bubbles==="function")v10Bubbles(["🎰","✨","🎉"],8);
+    },2700);
+  };
+
+  function buildWheel(){
+    const box=document.getElementById("v14WheelLabels"); if(!box)return;
+    box.innerHTML="";
+    cats.forEach((c,i)=>{
+      const s=document.createElement("span");
+      const angle=i*45+22.5;
+      const r=145;
+      s.textContent=c;
+      s.style.transform=`rotate(${angle}deg) translateY(-${r}px) rotate(-${angle}deg)`;
+      box.appendChild(s);
+    });
+  }
+  window.v14SpinWheel=function(){
+    if(wheelBusy)return;
+    wheelBusy=true;
+    const btn=document.getElementById("v14SpinBtn");
+    btn.disabled=true;
+    const index=Math.floor(Math.random()*cats.length);
+    const slice=360/cats.length;
+    const target=360*5+(360-(index*slice+slice/2));
+    wheelRot+=target;
+    document.getElementById("v14Wheel").style.transition="transform 3.4s cubic-bezier(.12,.75,.12,1)";
+    document.getElementById("v14Wheel").style.transform=`rotate(${wheelRot}deg)`;
+    setTimeout(()=>{
+      const cat=cats[index];
+      document.getElementById("v14WheelResult").textContent="🎉 Categoría elegida: "+cat;
+      const select=document.getElementById("v11Cat");
+      if(select)[...select.options].forEach(o=>{if(o.text===cat)o.selected=true});
+      if(typeof v11SmartGenerate==="function")v11SmartGenerate();
+      wheelBusy=false;btn.disabled=false;
+    },3600);
+  };
+
+  /* The page is fully laid out from the beginning; avoid continuous observers
+     and expensive per-scroll work. */
+  window.addEventListener("scroll",function(){
+    // Intentionally empty: no visual work on scroll.
+  },{passive:true});
+
+  document.addEventListener("DOMContentLoaded",buildWheel,{once:true});
+  if(document.readyState!=="loading")buildWheel();
+})();
+</script>
+</body>
+</html>
